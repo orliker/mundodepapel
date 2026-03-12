@@ -54,16 +54,16 @@ const REVIEWS = [
 ]
 
 const SIZES = [
-  { label: "Pequeno",  desc: "~10 cm",  price: 0 },
-  { label: "Médio",    desc: "~15 cm",  price: 3 },
-  { label: "Grande",   desc: "~20 cm",  price: 6 },
+  { label: "Pequeno",  desc: "~10 cm" },
+  { label: "Médio",    desc: "~15 cm" },
+  { label: "Grande",   desc: "~20 cm" },
 ]
 
 const MATERIALS = [
-  { label: "Papel Couché 250g",             desc: "Base premium, acabamento suave",   price: 0 },
-  { label: "Papel Glitter",                 desc: "Brilho e sofisticação especial",   price: 2 },
-  { label: "Papel Texturizado / Camurça",   desc: "Efeito aveludado e elegante",      price: 3 },
-  { label: "Papel Decorativo Especial",     desc: "Papéis de papelaria de alta qualidade", price: 2 },
+  { label: "Papel Couché 250g",           desc: "Base premium, acabamento suave" },
+  { label: "Papel Glitter",               desc: "Brilho e sofisticação especial" },
+  { label: "Papel Texturizado / Camurça", desc: "Efeito aveludado e elegante" },
+  { label: "Papel Decorativo Especial",   desc: "Papéis de papelaria de alta qualidade" },
 ]
 
 const COLOR_PRESETS = [
@@ -149,26 +149,6 @@ function StepDots({ total, current }: { total: number; current: number }) {
     </div>
   )
 }
-
-// ─── Price estimator ──────────────────────────────────────────────────────────
-interface PriceBreakdown {
-  base: number
-  name: number
-  age: number
-  size: number
-  material: number
-  total: number
-}
-
-function calcPriceDetailed(sizeLabel: string, materialLabel: string, hasName: boolean, hasAge: boolean): PriceBreakdown {
-  const base     = 7.9
-  const nameAdd  = hasName ? 1 : 0
-  const ageAdd   = hasAge  ? 1 : 0
-  const sizeAdd  = SIZES.find(s => s.label === sizeLabel)?.price ?? 0
-  const matAdd   = MATERIALS.find(m => m.label === materialLabel)?.price ?? 0
-  return { base, name: nameAdd, age: ageAdd, size: sizeAdd, material: matAdd, total: base + nameAdd + ageAdd + sizeAdd + matAdd }
-}
-
 // ─── SVG Live Preview ─────────────────────────────────────────────────────────
 function SVGPreview({ name, age, theme, colorHex, size, material }: {
   name: string; age: string; theme: string; colorHex: string; size: string; material: string
@@ -359,8 +339,7 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
   const fileRef = useRef<HTMLInputElement>(null)
 
   const TOTAL_STEPS = 6
-  const breakdown   = calcPriceDetailed(size, material, !!name, !!age)
-  const price       = breakdown.total
+  const price = 7.9
   const colorHex    = COLOR_PRESETS.find(c => c.value === colors)?.hex ?? "#3b82f6"
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -373,22 +352,22 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
 
   const buildWaMessage = () => {
     const lines = [
-      "Olá! Gostaria de encomendar um topo personalizado.",
-      "",
-      `Evento: ${event}`,
-      `Nome: ${name || "—"}`,
-      `Idade: ${age || "—"}`,
-      `Tema: ${theme || "—"}`,
-      `Cores: ${colors || "—"}`,
-      `Tamanho: ${size}`,
-      `Material: ${material}`,
-      `Imagem de referência: ${imagePreview ? "(Em anexo)" : "Sem imagem"}`,
-      `Notas: ${notes || "—"}`,
-      "",
-`Total estimado: ${price}€`,
-      "(Preço final confirmado após análise do design)",
-      "",
-      "Obrigado!",
+  "Olá! Gostaria de encomendar um topo personalizado.",
+  "",
+  `Evento: ${event}`,
+  `Nome: ${name || "—"}`,
+  `Idade: ${age || "—"}`,
+  `Tema: ${theme || "—"}`,
+  `Cores: ${colors || "—"}`,
+  `Tamanho: ${size}`,
+  `Material: ${material}`,
+  `Imagem de referência: ${imagePreview ? "(Em anexo)" : "Sem imagem"}`,
+  `Notas: ${notes || "—"}`,
+  "",
+  "Valores desde 7,90€.",
+  "O orçamento final será enviado via WhatsApp conforme a personalização e complexidade do trabalho.",
+  "",
+  "Obrigado!",
     ]
     return lines.join("\n")
   }
@@ -558,7 +537,7 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
                 <button key={s.label} onClick={() => setSize(s.label)} style={{ padding: "14px 10px", borderRadius: 14, border: `2px solid ${size === s.label ? "#3b82f6" : "#bfdbfe"}`, background: size === s.label ? "#eff6ff" : "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.18s" }}>
                   <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 15 }}>{s.label}</div>
                   <div style={{ fontSize: 12, color: "#64748b", marginTop: 3 }}>{s.desc}</div>
-                  {s.price > 0 && <div style={{ fontSize: 11, color: "#3b82f6", marginTop: 3, fontWeight: 700 }}>+{s.price}€</div>}
+           
                 </button>
               ))}
             </div>
@@ -573,7 +552,7 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
                     <div style={{ fontSize: 12, color: "#64748b" }}>{m.desc}</div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {m.price > 0 && <span style={{ fontSize: 12, color: "#3b82f6", fontWeight: 700 }}>+{m.price}€</span>}
+                    
                     {material === m.label && <span style={{ color: "#3b82f6" }}><CheckIcon /></span>}
                   </div>
                 </button>
@@ -582,20 +561,37 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
           </div>
           {/* Live price breakdown */}
           <div style={{ background: "linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius: 16, padding: "18px 20px", border: "1.5px solid #bfdbfe" }}>
-            <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14, marginBottom: 12 }}></div>
-            {[
-              ["Base",     `${breakdown.base.toFixed(2).replace(".", ",")}€`],
-              ...(breakdown.name > 0 ? [["+ Nome personalizado", `+${breakdown.name}€`]] : []),
-              ...(breakdown.age  > 0 ? [["+ Idade",              `+${breakdown.age}€`]]  : []),
-              ...(breakdown.size > 0 ? [["+ Tamanho " + size,    `+${breakdown.size}€`]] : []),
-              ...(breakdown.material > 0 ? [["+ " + material,    `+${breakdown.material}€`]] : []),
-            ].map(([label, val]) => (
-              <div key={label} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#475569", marginBottom: 6 }}>
-                <span>{label}</span><span style={{ fontWeight: 600 }}>{val}</span>
-              </div>
-            ))}
+            <div
+  style={{
+    background: "linear-gradient(135deg,#eff6ff,#dbeafe)",
+    borderRadius: 16,
+    padding: "18px 20px",
+    border: "1.5px solid #bfdbfe",
+  }}
+>
+  <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14, marginBottom: 8 }}>
+    Valores desde
+  </div>
+
+  <div
+    style={{
+      fontSize: 32,
+      fontWeight: 800,
+      color: "#1e3a5f",
+      marginBottom: 8,
+      fontFamily: "'Playfair Display', Georgia, serif",
+    }}
+  >
+    7,90€
+  </div>
+
+  <p style={{ fontSize: 13, color: "#475569", lineHeight: 1.6, margin: 0 }}>
+    O orçamento final será enviado via WhatsApp conforme a personalização,
+    materiais escolhidos e complexidade do trabalho.
+  </p>
+</div>
             <div style={{ borderTop: "1.5px solid #bfdbfe", marginTop: 10, paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontWeight: 700, color: "#475569", fontSize: 14 }}>Total estimado</span>
+              <span style={{ fontWeight: 700, color: "#475569", fontSize: 14 }}>Valores desde</span>
               <span style={{ fontSize: 28, fontWeight: 800, color: "#1e3a5f", fontFamily: "'Playfair Display',Georgia,serif" }}>{price.toFixed(2).replace(".", ",")}€</span>
             </div>
             <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 8 }}>Preço final confirmado via WhatsApp conforme personalização.</p>
@@ -665,22 +661,13 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
               </div>
             )}
             <div style={{ borderTop: "1.5px solid #bfdbfe", marginTop: 14, paddingTop: 14 }}>
-              {[
-                ["Base", `${breakdown.base.toFixed(2).replace(".", ",")}€`],
-                ...(breakdown.name > 0     ? [["+ Nome",        `+${breakdown.name}€`]]     : []),
-                ...(breakdown.age > 0      ? [["+ Idade",       `+${breakdown.age}€`]]      : []),
-                ...(breakdown.size > 0     ? [["+ Tamanho",     `+${breakdown.size}€`]]     : []),
-                ...(breakdown.material > 0 ? [["+ Material",    `+${breakdown.material}€`]] : []),
-              ].map(([label, val]) => (
-                <div key={label} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#64748b", marginBottom: 5 }}>
-                  <span>{label}</span><span style={{ fontWeight: 600 }}>{val}</span>
-                </div>
-              ))}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, paddingTop: 8, borderTop: "1px solid #bfdbfe" }}>
-                <span style={{ fontWeight: 700, color: "#475569", fontSize: 14 }}>Total estimado</span>
-                <span style={{ fontWeight: 800, color: "#1e3a5f", fontSize: 22, fontFamily: "'Playfair Display',Georgia,serif" }}>{price.toFixed(2).replace(".", ",")}€</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontWeight: 700, color: "#475569", fontSize: 14 }}>Valores desde</span>
+                <span style={{ fontWeight: 800, color: "#1e3a5f", fontSize: 22, fontFamily: "'Playfair Display',Georgia,serif" }}>7,90€</span>
               </div>
-              <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 6 }}>Preço final confirmado via WhatsApp conforme personalização.</p>
+              <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 6 }}>
+                O orçamento final será enviado via WhatsApp conforme a personalização e complexidade do trabalho.
+              </p>
             </div>
           </div>
 
@@ -732,10 +719,10 @@ function CartPanel({ items, onRemove, onClose }: { items: CartItem[]; onRemove: 
         `Tamanho: ${item.size}`,
         `Material: ${item.material}`,
         `Notas: ${item.notes || "—"}`,
-        `Preço: ${item.price}€`,
+        "Valores desde 7,90€.",
         "",
       ]),
-      `Total estimado: ${total}€`,
+      "O orçamento final será confirmado via WhatsApp.",
       "",
       "Obrigado!",
     ]
@@ -768,7 +755,7 @@ function CartPanel({ items, onRemove, onClose }: { items: CartItem[]; onRemove: 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14 }}>{item.event} — {item.name || "Sem nome"}</div>
                 <div style={{ fontSize: 13, color: "#64748b", marginTop: 3 }}>{item.size} · {item.material} · {item.theme || "Sem tema"}</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#3b82f6", marginTop: 6 }}>{item.price}€</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#3b82f6", marginTop: 6 }}>Desde 7,90€</div>
               </div>
               <button onClick={() => onRemove(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: 4, flexShrink: 0 }} aria-label="Remover do carrinho"><TrashIcon /></button>
             </div>
@@ -778,8 +765,8 @@ function CartPanel({ items, onRemove, onClose }: { items: CartItem[]; onRemove: 
         {items.length > 0 && (
           <div style={{ padding: "20px 24px", borderTop: "1.5px solid #eff6ff", background: "#fff", position: "sticky", bottom: 0 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <span style={{ fontWeight: 700, color: "#475569" }}>Total estimado</span>
-              <span style={{ fontWeight: 800, fontSize: 22, color: "#1e3a5f", fontFamily: "'Playfair Display',Georgia,serif" }}>{total}€</span>
+              <span style={{ fontWeight: 700, color: "#475569" }}>Valores desde</span>
+              <span style={{ fontWeight: 800, fontSize: 22, color: "#1e3a5f", fontFamily: "'Playfair Display',Georgia,serif" }}>Orçamento via WhatsApp</span>
             </div>
             <a href={waLink(buildCartWa())} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "15px 24px", borderRadius: 100, background: "#25d366", color: "#fff", fontWeight: 800, fontSize: 16, textDecoration: "none", boxShadow: "0 6px 24px rgba(37,211,102,0.35)" }}>
               <WaIcon size={20} />
@@ -1218,7 +1205,7 @@ export default function Page() {
           {/* Price table */}
           <Reveal delay={160}>
             <div style={{ marginTop: 44, background: "#f8faff", borderRadius: 20, padding: "28px 32px", border: "1.5px solid #e0effe" }}>
-              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontWeight: 700, fontSize: 18, color: "#1e3a5f", marginBottom: 20 }}>Tabela de preços indicativos</div>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontWeight: 700, fontSize: 18, color: "#1e3a5f", marginBottom: 20 }}>Como funciona o orçamento</div>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
                   <thead>
@@ -1229,23 +1216,29 @@ export default function Page() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      ["Simples", "Papel Couché 250g", "Pequeno (~10cm)", "7,90€–10€"],
-                      ["Médio", "Papel Glitter", "Médio (~15cm)", "10€–14€"],
-                      ["Premium", "Papel Texturizado", "Grande (~20cm)", "14€–20€"],
-                      ["Especial", "Papel Decorativo", "XL (+20cm)", "20€–28€"],
-                    ].map(([tipo, mat, tam, preco], i) => (
-                      <tr key={i} style={{ borderBottom: "1px solid #e0effe", background: i % 2 === 0 ? "#fff" : "#f8faff" }}>
-                        <td style={{ padding: "11px 16px", color: "#1e3a5f", fontWeight: 600 }}>{tipo}</td>
-                        <td style={{ padding: "11px 16px", color: "#475569" }}>{mat}</td>
-                        <td style={{ padding: "11px 16px", color: "#475569" }}>{tam}</td>
-                        <td style={{ padding: "11px 16px", color: "#3b82f6", fontWeight: 700 }}>{preco}</td>
-                      </tr>
-                    ))}
-                  </tbody>
+  {[
+    ["Base", "Papel Couché 250g", "Modelos personalizados", "Desde 7,90€"],
+    ["Acabamento especial", "Papel Glitter", "Conforme o pedido", "Orçamento via WhatsApp"],
+    ["Detalhe premium", "Papel Texturizado", "Conforme o pedido", "Orçamento via WhatsApp"],
+    ["Papeleria especial", "Papel Decorativo", "Conforme o pedido", "Orçamento via WhatsApp"],
+  ].map(([tipo, mat, tam, preco], i) => (
+    <tr
+      key={i}
+      style={{
+        borderBottom: "1px solid #e0effe",
+        background: i % 2 === 0 ? "#fff" : "#f8faff",
+      }}
+    >
+      <td style={{ padding: "11px 16px", color: "#1e3a5f", fontWeight: 600 }}>{tipo}</td>
+      <td style={{ padding: "11px 16px", color: "#475569" }}>{mat}</td>
+      <td style={{ padding: "11px 16px", color: "#475569" }}>{tam}</td>
+      <td style={{ padding: "11px 16px", color: "#3b82f6", fontWeight: 700 }}>{preco}</td>
+    </tr>
+  ))}
+</tbody>
                 </table>
               </div>
-              <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 12 }}>Preços indicativos. O valor final depende da complexidade do design e dos materiais escolhidos.</p>
+              <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 12 }}>Como funciona o orçamento. O valor final depende da complexidade do design e dos materiais escolhidos.</p>
             </div>
           </Reveal>
         </div>
