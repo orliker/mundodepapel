@@ -27,23 +27,126 @@ interface CartItem {
 const EVENTS = ["Aniversário", "Batizado", "Casamento", "Dia da Mãe", "Dia do Pai", "Dia dos Namorados", "Páscoa", "Natal", "Outro"]
 
 const CATEGORIES = [
-  { id: "aniversario", name: "Aniversário",      emoji: "🎂", imgText: "Topo+bolo+aniversario+colorido+festivo+baloes", desc: "Do 1.º ano ao que quiser. Nome, idade e tema à escolha.", badge: "Mais popular", price: 8 },
-  { id: "batizado",    name: "Batizado",          emoji: "🕊️", imgText: "Topo+batizado+pomba+branca+flores+delicado",     desc: "Um momento único que merece um topo único.",              badge: null,          price: 9 },
-  { id: "casamento",   name: "Casamento",         emoji: "💍", imgText: "Topo+casamento+noivos+branco+elegante+flores",   desc: "Elegância artesanal para o vosso dia mais especial.",     badge: "Premium",     price: 12 },
-  { id: "dia-mae",     name: "Dia da Mãe",        emoji: "🌷", imgText: "Topo+dia+mae+flores+rosa+coracao+dourado",       desc: "Surpreende a mulher mais especial da tua vida.",          badge: null,          price: 7 },
-  { id: "dia-pai",     name: "Dia do Pai",        emoji: "👔", imgText: "Topo+dia+pai+azul+moderno+personalizado",        desc: "Celebra o herói da família com estilo próprio.",          badge: null,          price: 7 },
-  { id: "namorados",   name: "Dia dos Namorados", emoji: "❤️", imgText: "Topo+namorados+coracao+vermelho+romantico",      desc: "Amor em cada detalhe, feito à mão com carinho.",          badge: null,          price: 8 },
-  { id: "pascoa",      name: "Páscoa",            emoji: "🐣", imgText: "Topo+pascoa+coelho+ovos+coloridos+primavera",    desc: "Alegria e renovação para toda a família.",               badge: null,          price: 7 },
-  { id: "natal",       name: "Natal",             emoji: "🎄", imgText: "Topo+natal+arvore+estrela+vermelho+verde+nevado", desc: "Magia natalícia para momentos inesquecíveis.",           badge: null,          price: 8 },
+  {
+    id: "aniversario",
+    name: "Aniversário",
+    emoji: "🎂",
+    image: "/images/categorias/aniversario.jpg",
+    desc: "Do 1.º ano ao que quiser. Nome, idade e tema à escolha.",
+    badge: "Mais popular",
+    price: 8,
+  },
+  {
+  id: "halloween",
+  name: "Halloween",
+  emoji: "🎃",
+  image: "/images/categorias/halloween.jpg",
+  desc: "Topos de bolo assustadores e divertidos para festas de Halloween. Personalize com nome e idade.",
+  badge: "Edição especial",
+  price: 8
+  },
+  {
+    id: "batizado",
+    name: "Batizado",
+    emoji: "🕊️",
+    image: "/images/categorias/batizado.jpg",
+    desc: "Um momento único que merece um topo único.",
+    badge: null,
+    price: 9,
+  },
+  {
+    id: "casamento",
+    name: "Casamento",
+    emoji: "💍",
+    image: "/images/categorias/casamento.jpg",
+    desc: "Elegância artesanal para o vosso dia mais especial.",
+    badge: "Premium",
+    price: 12,
+  },
+  {
+    id: "dia-mae",
+    name: "Dia da Mãe",
+    emoji: "🌷",
+    image: "/images/categorias/dia-mae.jpg",
+    desc: "Surpreende a mulher mais especial da tua vida.",
+    badge: null,
+    price: 7,
+  },
+  {
+    id: "dia-pai",
+    name: "Dia do Pai",
+    emoji: "👔",
+    image: "/images/categorias/dia-pai.jpg",
+    desc: "Celebra o herói da família com estilo próprio.",
+    badge: null,
+    price: 7,
+  },
+  {
+    id: "namorados",
+    name: "Dia dos Namorados",
+    emoji: "❤️",
+    image: "/images/categorias/namorados.jpg",
+    desc: "Amor em cada detalhe, feito à mão com carinho.",
+    badge: null,
+    price: 8,
+  },
+  {
+    id: "pascoa",
+    name: "Páscoa",
+    emoji: "🐣",
+    image: "/images/categorias/pascoa.jpg",
+    desc: "Alegria e renovação para toda a família.",
+    badge: null,
+    price: 7,
+  },
+  {
+    id: "natal",
+    name: "Natal",
+    emoji: "🎄",
+    image: "/images/categorias/natal.jpg",
+    desc: "Magia natalícia para momentos inesquecíveis.",
+    badge: null,
+    price: 8,
+  },
 ]
 
 const GALLERY = [
-  { id: "g1", title: "Topo Clássico",  tag: "Casamento",  imgText: "Topo+casamento+classico+branco+elegante+flores+papel" },
-  { id: "g2", title: "Topo Boho",      tag: "Casamento",  imgText: "Topo+boho+pampas+flores+secas+bege+natural+artesanal" },
-  { id: "g3", title: "Super-Heróis",   tag: "Aniversário", imgText: "Topo+super+herois+colorido+criativo+papel+festivo" },
-  { id: "g4", title: "Unicórnio",      tag: "Aniversário", imgText: "Topo+unicornio+pastel+glitter+rosa+dourado+magico" },
-  { id: "g5", title: "Pomba Branca",   tag: "Batizado",   imgText: "Topo+batizado+pomba+branca+flores+azul+delicado" },
-  { id: "g6", title: "Flores Rosa",    tag: "Dia da Mãe", imgText: "Topo+dia+mae+flores+rosa+coracao+dourado+artesanal" },
+  {
+    id: "g1",
+    title: "Topo Clássico",
+    tag: "Casamento",
+    image: "/images/galeria/classico.jpg",
+  },
+  {
+    id: "g2",
+    title: "Topo Boho",
+    tag: "Casamento",
+    image: "/images/galeria/boho.jpg",
+  },
+  {
+    id: "g3",
+    title: "Super-Heróis",
+    tag: "Aniversário",
+    image: "/images/galeria/super-herois.jpg",
+  },
+  {
+    id: "g4",
+    title: "Unicórnio",
+    tag: "Aniversário",
+    image: "/images/galeria/unicornio.jpg",
+  },
+  {
+    id: "g5",
+    title: "Pomba Branca",
+    tag: "Batizado",
+    image: "/images/galeria/pomba-branca.jpg",
+  },
+  {
+    id: "g6",
+    title: "Flores Rosa",
+    tag: "Dia da Mãe",
+    image: "/images/galeria/flores-rosa.jpg",
+  },
 ]
 
 const REVIEWS = [
@@ -60,10 +163,26 @@ const SIZES = [
 ]
 
 const MATERIALS = [
-  { label: "Papel Couché 250g",           desc: "Base premium, acabamento suave" },
-  { label: "Papel Glitter",               desc: "Brilho e sofisticação especial" },
-  { label: "Papel Texturizado / Camurça", desc: "Efeito aveludado e elegante" },
-  { label: "Papel Decorativo Especial",   desc: "Papéis de papelaria de alta qualidade" },
+  {
+    label: "Papel Couché 250g",
+    desc: "Base premium, acabamento suave",
+    image: "/images/materiais/couche.jpg",
+  },
+  {
+    label: "Papel Glitter",
+    desc: "Brilho e sofisticação especial",
+    image: "/images/materiais/glitter.jpg",
+  },
+  {
+    label: "Papel Texturizado / Camurça",
+    desc: "Efeito aveludado e elegante",
+    image: "/images/materiais/texturizado.jpg",
+  },
+  {
+    label: "Papel Decorativo Especial",
+    desc: "Papéis de papelaria de alta qualidade",
+    image: "/images/materiais/decorativo.jpg",
+  },
 ]
 
 const COLOR_PRESETS = [
@@ -949,8 +1068,11 @@ export default function Page() {
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <div style={{ position: "relative", width: "min(380px, 100%)" }}>
               <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 24px 64px rgba(30,58,95,0.22)", border: "4px solid rgba(255,255,255,0.9)" }}>
-                <img src="https://placehold.co/400x440?text=Topos+de+Bolo+Artesanais+Portugal+Personalizados+Elegantes+Azul" alt="Colagem de topos de bolo artesanais personalizados feitos em Portugal com cores azul e branco" style={{ width: "100%", display: "block" }} />
-              </div>
+               <img
+  src="/images/hero/hero-topos.jpg"
+  alt="Colagem de topos de bolo artesanais personalizados feitos em Portugal com cores azul e branco"
+  style={{ width: "100%", display: "block" }}
+/>              </div>
               {/* Floating card */}
               <div style={{ position: "absolute", bottom: -18, left: -22, background: "#fff", borderRadius: 18, padding: "14px 18px", boxShadow: "0 12px 36px rgba(30,58,95,0.18)", border: "1.5px solid #bfdbfe" }}>
                 <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Pronto em</div>
@@ -1047,7 +1169,11 @@ export default function Page() {
               <Reveal key={cat.id} delay={i * 60}>
                 <div className="cat-card" style={{ background: "#fff", borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 20px rgba(30,58,95,0.08)", border: "1.5px solid #e0effe" }}>
                   <div style={{ position: "relative" }}>
-                    <img src={`https://placehold.co/280x180?text=${cat.imgText}`} alt={`Exemplo de topo de bolo para ${cat.name} feito artesanalmente`} style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
+                    <img
+  src={cat.image}
+  alt={`Exemplo de topo de bolo para ${cat.name} feito artesanalmente`}
+  style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }}
+/>
                     {cat.badge && <div style={{ position: "absolute", top: 10, right: 10, background: "#3b82f6", color: "#fff", borderRadius: 100, padding: "3px 10px", fontSize: 11, fontWeight: 800 }}>{cat.badge}</div>}
                     <div style={{ position: "absolute", top: 10, left: 10, background: "rgba(255,255,255,0.92)", borderRadius: 100, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "#3b82f6" }}>Desde {cat.price}€</div>
                   </div>
@@ -1100,7 +1226,11 @@ export default function Page() {
             {GALLERY.map((item, i) => (
               <Reveal key={item.id} delay={i * 70}>
                 <div className="hover-lift" style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 20px rgba(30,58,95,0.09)", border: "1.5px solid #e0effe", background: "#fff", cursor: "pointer" }}>
-                  <img src={`https://placehold.co/400x280?text=${item.imgText}`} alt={`${item.title} — exemplo de topo de bolo para ${item.tag} feito artesanalmente em Portugal`} style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }} />
+                  <img
+  src={item.image}
+  alt={`${item.title} — exemplo de topo de bolo para ${item.tag} feito artesanalmente em Portugal`}
+  style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }}
+/>
                   <div style={{ padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div>
                       <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14 }}>{item.title}</div>
