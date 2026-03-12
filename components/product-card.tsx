@@ -556,8 +556,7 @@ function Configurator() {
             <p style={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
               Valores desde 7,99€. O orçamento final será enviado via WhatsApp conforme a personalização e complexidade do trabalho.
             </p>
-          </div>
-          </div>
+                    </div>
 
           {/* Action buttons */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 20 }}>
