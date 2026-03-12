@@ -1,6 +1,8 @@
+
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
 import { AIChatWidget } from "@/components/ai-chat-widget"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -9,6 +11,19 @@ const WA_BASE = `https://wa.me/${WA_NUMBER}`
 const waLink = (text: string) => `${WA_BASE}?text=${encodeURIComponent(text)}`
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+interface ProductReference {
+  id: string
+  slug: string
+  name: string
+  emoji: string
+  image: string
+  desc: string
+  badge: string | null
+  price: number
+  materials: string[]
+  aiContext: string
+}
+
 interface CartItem {
   id: string
   event: string
@@ -21,92 +36,130 @@ interface CartItem {
   notes: string
   imagePreview?: string
   price: number
+  referenceName?: string
+  referenceSlug?: string
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const EVENTS = ["Aniversário", "Batizado", "Casamento", "Dia da Mãe", "Dia do Pai", "Dia dos Namorados", "Páscoa", "Natal", "Outro"]
 
-const CATEGORIES = [
+const CATEGORIES: ProductReference[] = [
   {
     id: "aniversario",
+    slug: "aniversario",
     name: "Aniversário",
     emoji: "🎂",
     image: "/images/categorias/aniversario.png",
     desc: "Do 1.º ano ao que quiser. Nome, idade e tema à escolha.",
     badge: "Mais popular",
     price: 8,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Texturizado / Camurça"],
+    aiContext:
+      "Topo de bolo para aniversário, alegre, personalizado, artesanal premium, com nome, idade, tema infantil ou elegante, cores definidas pelo cliente e acabamento delicado.",
   },
   {
-  id: "halloween",
-  name: "Halloween",
-  emoji: "🎃",
-  image: "/images/categorias/halloween.png",
-  desc: "Topos de bolo assustadores e divertidos para festas de Halloween. Personalize com nome e idade.",
-  badge: "Edição especial",
-  price: 8
+    id: "halloween",
+    slug: "halloween",
+    name: "Halloween",
+    emoji: "🎃",
+    image: "/images/categorias/halloween.png",
+    desc: "Topos de bolo assustadores e divertidos para festas de Halloween. Personalize com nome e idade.",
+    badge: "Edição especial",
+    price: 8,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Decorativo Especial"],
+    aiContext:
+      "Topo de bolo para Halloween, criativo, divertido, temático, com abóboras, morcegos, teias, laranja, preto e roxo, feito em papel premium e totalmente personalizado.",
   },
   {
     id: "batizado",
+    slug: "batizado",
     name: "Batizado",
     emoji: "🕊️",
     image: "/images/categorias/batizado.png",
     desc: "Um momento único que merece um topo único.",
     badge: null,
     price: 9,
+    materials: ["Papel Couché 250g", "Papel Texturizado / Camurça", "Papel Decorativo Especial"],
+    aiContext:
+      "Topo de bolo para batizado, delicado, elegante, religioso, artesanal, com anjinho, pomba, cruz, tons suaves, branco, bege, dourado claro e acabamento premium.",
   },
   {
     id: "casamento",
+    slug: "casamento",
     name: "Casamento",
     emoji: "💍",
     image: "/images/categorias/casamento.png",
     desc: "Elegância artesanal para o vosso dia mais especial.",
     badge: "Premium",
     price: 12,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Texturizado / Camurça"],
+    aiContext:
+      "Topo de bolo para casamento, elegante, delicado, artesanal, romântico, acabamento premium, tons suaves, flores, dourado opcional, personalização com nomes e data.",
   },
   {
     id: "dia-mae",
+    slug: "dia-mae",
     name: "Dia da Mãe",
     emoji: "🌷",
     image: "/images/categorias/dia-mae.png",
     desc: "Surpreende a mulher mais especial da tua vida.",
     badge: null,
     price: 7,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Decorativo Especial"],
+    aiContext:
+      "Topo de bolo para Dia da Mãe, feminino, delicado, floral, carinhoso, elegante, com cores suaves, rosas, dourado leve e visual artesanal premium.",
   },
   {
     id: "dia-pai",
+    slug: "dia-pai",
     name: "Dia do Pai",
     emoji: "👔",
     image: "/images/categorias/dia-pai.png",
     desc: "Celebra o herói da família com estilo próprio.",
     badge: null,
     price: 7,
+    materials: ["Papel Couché 250g", "Papel Texturizado / Camurça", "Papel Decorativo Especial"],
+    aiContext:
+      "Topo de bolo para Dia do Pai, elegante, masculino, carinhoso, artesanal, com estilo moderno, cores sóbrias ou personalizadas e acabamento premium.",
   },
   {
     id: "namorados",
+    slug: "namorados",
     name: "Dia dos Namorados",
     emoji: "❤️",
     image: "/images/categorias/namorados.png",
     desc: "Amor em cada detalhe, feito à mão com carinho.",
     badge: null,
     price: 8,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Decorativo Especial"],
+    aiContext:
+      "Topo de bolo para Dia dos Namorados, romântico, delicado, com corações, nomes, frases curtas, vermelho, rosa, branco ou dourado, visual premium e artesanal.",
   },
   {
     id: "pascoa",
+    slug: "pascoa",
     name: "Páscoa",
     emoji: "🐣",
     image: "/images/categorias/pascoa.png",
     desc: "Alegria e renovação para toda a família.",
     badge: null,
     price: 7,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Decorativo Especial"],
+    aiContext:
+      "Topo de bolo para Páscoa, alegre, familiar, delicado, com coelhinhos, ovos, flores, cores pastel e acabamento artesanal premium.",
   },
   {
     id: "natal",
+    slug: "natal",
     name: "Natal",
     emoji: "🎄",
-    image: "/images/categorias/natal.jpg",
+    image: "/images/categorias/natal.png",
     desc: "Magia natalícia para momentos inesquecíveis.",
     badge: null,
     price: 8,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Decorativo Especial"],
+    aiContext:
+      "Topo de bolo para Natal, mágico, elegante, festivo, com estrelas, pinheiro, dourado, vermelho, branco, visual artesanal premium e personalizado.",
   },
 ]
 
@@ -441,25 +494,304 @@ function AIDesignPanel({ onSuggestion }: { onSuggestion: (text: string) => void 
   )
 }
 
+  function CategoryDetailsDrawer({
+  item,
+  open,
+  onClose,
+  onCustomize,
+}: {
+  item: ProductReference | null
+  open: boolean
+  onClose: () => void
+  onCustomize: (item: ProductReference) => void
+}) {
+  const [aiDescription, setAiDescription] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!open || !item) return
+
+    const currentItem = item
+    let cancelled = false
+
+    async function loadDescription() {
+      setLoading(true)
+      setAiDescription("")
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: "user",
+                content: `
+Cria uma descrição curta e comercial em português de Portugal para uma página de produto da Mundo de Papel Portugal.
+
+Categoria: ${currentItem.name}
+Descrição base: ${currentItem.desc}
+Materiais: ${currentItem.materials.join(", ")}
+Contexto visual: ${currentItem.aiContext}
+
+Regras:
+- tom delicado, elegante, premium e artesanal
+- no máximo 90 palavras
+- não inventar materiais fora da lista
+- não mencionar preços fechados
+- reforçar personalização
+                `.trim(),
+              },
+            ],
+          }),
+        })
+
+        const data = await res.json()
+        const text = data?.reply?.trim() || currentItem.desc
+
+        if (!cancelled) setAiDescription(text)
+      } catch {
+        if (!cancelled) setAiDescription(currentItem.desc)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    loadDescription()
+
+    return () => {
+      cancelled = true
+    }
+  }, [open, item])
+
+  if (!open || !item) return null
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 3000, display: "flex", justifyContent: "flex-end" }}>
+      <div
+        onClick={onClose}
+        style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(2px)" }}
+      />
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: 520,
+          height: "100vh",
+          background: "#fff",
+          overflowY: "auto",
+          boxShadow: "-12px 0 40px rgba(0,0,0,0.18)",
+          padding: 24,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#3b82f6", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              Categoria
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 30, color: "#1e3a5f" }}>
+              {item.emoji} {item.name}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b" }}
+            aria-label="Fechar"
+          >
+            <XIcon />
+          </button>
+        </div>
+
+        <div style={{ borderRadius: 20, overflow: "hidden", border: "1.5px solid #dbeafe", marginBottom: 18 }}>
+          <img
+            src={item.image}
+            alt={item.name}
+            style={{ width: "100%", height: 260, objectFit: "cover", display: "block" }}
+          />
+        </div>
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+          <span
+            style={{
+              background: "#eff6ff",
+              color: "#1e3a5f",
+              borderRadius: 100,
+              padding: "7px 12px",
+              fontWeight: 700,
+              fontSize: 13,
+            }}
+          >
+            Valores desde {item.price}€
+          </span>
+
+          {item.badge && (
+            <span
+              style={{
+                background: "#3b82f6",
+                color: "#fff",
+                borderRadius: 100,
+                padding: "7px 12px",
+                fontWeight: 800,
+                fontSize: 12,
+              }}
+            >
+              {item.badge}
+            </span>
+          )}
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <h3
+            style={{
+              fontSize: 14,
+              fontWeight: 800,
+              color: "#1e3a5f",
+              marginBottom: 8,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+            }}
+          >
+            Descrição
+          </h3>
+          <p style={{ color: "#475569", lineHeight: 1.7, fontSize: 15 }}>
+            {loading ? "A gerar descrição com IA..." : aiDescription || item.desc}
+          </p>
+        </div>
+
+        <div style={{ marginBottom: 22 }}>
+          <h3
+            style={{
+              fontSize: 14,
+              fontWeight: 800,
+              color: "#1e3a5f",
+              marginBottom: 10,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+            }}
+          >
+            Materiais
+          </h3>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            {item.materials.map((mat) => {
+              const materialData = MATERIALS.find((m) => m.label === mat)
+
+              return (
+                <div
+                  key={mat}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "12px 14px",
+                    border: "1.5px solid #dbeafe",
+                    borderRadius: 14,
+                    background: "#f8fbff",
+                  }}
+                >
+                  {materialData?.image && (
+                    <img
+                      src={materialData.image}
+                      alt={mat}
+                      style={{
+                        width: 52,
+                        height: 52,
+                        objectFit: "cover",
+                        borderRadius: 10,
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
+
+                  <div>
+                    <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14 }}>{mat}</div>
+                    <div style={{ fontSize: 12, color: "#64748b" }}>
+                      {materialData?.desc || "Material premium disponível para personalização"}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 12 }}>
+          <button
+            onClick={() => onCustomize(item)}
+            style={{
+              padding: "15px 18px",
+              borderRadius: 100,
+              border: "none",
+              background: "#3b82f6",
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: 16,
+              cursor: "pointer",
+            }}
+          >
+            Personalizar este modelo
+          </button>
+
+          <a
+            href={waLink(`Olá! Gostaria de pedir orçamento para o modelo "${item.name}".`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              padding: "14px 18px",
+              borderRadius: 100,
+              border: "2px solid #25d366",
+              color: "#25d366",
+              fontWeight: 800,
+              fontSize: 15,
+              textDecoration: "none",
+              textAlign: "center",
+            }}
+          >
+            Enviar referência no WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
 // ─── Configurator ─────────────────────────────────────────────────────────────
-function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }) {
-  const [step, setStep]         = useState(0)
-  const [event, setEvent]       = useState("")
-  const [name, setName]         = useState("")
-  const [age, setAge]           = useState("")
-  const [theme, setTheme]       = useState("")
-  const [colors, setColors]     = useState("")
-  const [size, setSize]         = useState("Médio")
-  const [material, setMaterial] = useState("Papel Couché 250g")
-  const [notes, setNotes]       = useState("")
-  const [imagePreview, setImagePreview] = useState<string | undefined>()
-  const [submitted, setSubmitted]       = useState(false)
-  const [showPreview, setShowPreview]   = useState(false)
+function Configurator({
+  onAddToCart,
+  initialReference,
+}: {
+  onAddToCart: (item: CartItem) => void
+  initialReference?: ProductReference | null
+}) {
+  const [step, setStep] = useState(0)
+  const [event, setEvent] = useState(initialReference?.name || "")
+  const [name, setName] = useState("")
+  const [age, setAge] = useState("")
+  const [theme, setTheme] = useState(initialReference?.name || "")
+  const [colors, setColors] = useState("")
+  const [size, setSize] = useState("Médio")
+  const [material, setMaterial] = useState(initialReference?.materials?.[0] || "Papel Couché 250g")
+  const [notes, setNotes] = useState(
+    initialReference
+      ? `Referência base selecionada: ${initialReference.name}. ${initialReference.desc}`
+      : ""
+  )
+  const [imagePreview, setImagePreview] = useState<string | undefined>(initialReference?.image)
+  const [submitted, setSubmitted] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!initialReference) return
+    setEvent(initialReference.name)
+    setTheme((prev) => prev || initialReference.name)
+    setMaterial(initialReference.materials?.[0] || "Papel Couché 250g")
+    setImagePreview(initialReference.image)
+    setNotes(`Referência base selecionada: ${initialReference.name}. ${initialReference.desc}`)
+  }, [initialReference])
 
   const TOTAL_STEPS = 6
   const price = 7.9
-  const colorHex    = COLOR_PRESETS.find(c => c.value === colors)?.hex ?? "#3b82f6"
+  const colorHex = COLOR_PRESETS.find((c) => c.value === colors)?.hex ?? "#3b82f6"
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -471,22 +803,24 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
 
   const buildWaMessage = () => {
     const lines = [
-  "Olá! Gostaria de encomendar um topo personalizado.",
-  "",
-  `Evento: ${event}`,
-  `Nome: ${name || "—"}`,
-  `Idade: ${age || "—"}`,
-  `Tema: ${theme || "—"}`,
-  `Cores: ${colors || "—"}`,
-  `Tamanho: ${size}`,
-  `Material: ${material}`,
-  `Imagem de referência: ${imagePreview ? "(Em anexo)" : "Sem imagem"}`,
-  `Notas: ${notes || "—"}`,
-  "",
-  "Valores desde 7,90€.",
-  "O orçamento final será enviado via WhatsApp conforme a personalização e complexidade do trabalho.",
-  "",
-  "Obrigado!",
+      "Olá! Gostaria de encomendar um topo personalizado.",
+      "",
+      `Referência base: ${initialReference?.name || "Sem referência específica"}`,
+      `Slug da referência: ${initialReference?.slug || "—"}`,
+      `Evento: ${event}`,
+      `Nome: ${name || "—"}`,
+      `Idade: ${age || "—"}`,
+      `Tema: ${theme || "—"}`,
+      `Cores: ${colors || "—"}`,
+      `Tamanho: ${size}`,
+      `Material: ${material}`,
+      `Imagem de referência: ${imagePreview ? "(Imagem incluída)" : "Sem imagem"}`,
+      `Notas: ${notes || "—"}`,
+      "",
+      "Valores desde 7,90€.",
+      "O orçamento final será enviado via WhatsApp conforme a personalização e complexidade do trabalho.",
+      "",
+      "Obrigado!",
     ]
     return lines.join("\n")
   }
@@ -499,16 +833,33 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
   const handleAddToCart = () => {
     onAddToCart({
       id: Date.now().toString(),
-      event, name, age, theme, colors, size, material, notes,
+      event,
+      name,
+      age,
+      theme,
+      colors,
+      size,
+      material,
+      notes,
       imagePreview,
       price,
+      referenceName: initialReference?.name,
+      referenceSlug: initialReference?.slug,
     })
     setSubmitted(true)
   }
 
   const reset = () => {
-    setStep(0); setEvent(""); setName(""); setAge(""); setTheme(""); setColors("")
-    setSize("Médio"); setMaterial("Papel Couché 250g"); setNotes(""); setImagePreview(undefined)
+    setStep(0)
+    setEvent(initialReference?.name || "")
+    setName("")
+    setAge("")
+    setTheme(initialReference?.name || "")
+    setColors("")
+    setSize("Médio")
+    setMaterial(initialReference?.materials?.[0] || "Papel Couché 250g")
+    setNotes(initialReference ? `Referência base selecionada: ${initialReference.name}. ${initialReference.desc}` : "")
+    setImagePreview(initialReference?.image)
     setSubmitted(false)
     if (fileRef.current) fileRef.current.value = ""
   }
@@ -520,24 +871,67 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
   }
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "12px 16px", border: "2px solid #bfdbfe", borderRadius: 12,
-    fontSize: 15, fontFamily: "inherit", outline: "none", background: "#fff",
-    color: "#1e3a5f", transition: "border-color 0.2s",
+    width: "100%",
+    padding: "12px 16px",
+    border: "2px solid #bfdbfe",
+    borderRadius: 12,
+    fontSize: 15,
+    fontFamily: "inherit",
+    outline: "none",
+    background: "#fff",
+    color: "#1e3a5f",
+    transition: "border-color 0.2s",
   }
 
   const chipStyle = (active: boolean): React.CSSProperties => ({
-    padding: "9px 18px", borderRadius: 100, border: `2px solid ${active ? "#3b82f6" : "#bfdbfe"}`,
-    background: active ? "#eff6ff" : "#fff", color: active ? "#1e3a5f" : "#64748b",
-    fontWeight: active ? 700 : 500, fontSize: 14, cursor: "pointer", transition: "all 0.18s",
+    padding: "9px 18px",
+    borderRadius: 100,
+    border: `2px solid ${active ? "#3b82f6" : "#bfdbfe"}`,
+    background: active ? "#eff6ff" : "#fff",
+    color: active ? "#1e3a5f" : "#64748b",
+    fontWeight: active ? 700 : 500,
+    fontSize: 14,
+    cursor: "pointer",
+    transition: "all 0.18s",
   })
 
   if (submitted) {
     return (
       <div style={{ textAlign: "center", padding: "40px 24px" }}>
-        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>✅</div>
-        <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 24, color: "#1e3a5f", marginBottom: 10 }}>Pedido Enviado!</h3>
-        <p style={{ color: "#475569", marginBottom: 28, lineHeight: 1.6 }}>O teu pedido foi enviado para o WhatsApp. Entraremos em contacto em breve com confirmação e prazo de produção.</p>
-        <button onClick={reset} style={{ padding: "12px 28px", borderRadius: 100, border: "2px solid #3b82f6", background: "#fff", color: "#3b82f6", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>
+        <div
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: "50%",
+            background: "#dcfce7",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 20px",
+            fontSize: 32,
+          }}
+        >
+          ✅
+        </div>
+        <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 24, color: "#1e3a5f", marginBottom: 10 }}>
+          Pedido Enviado!
+        </h3>
+        <p style={{ color: "#475569", marginBottom: 28, lineHeight: 1.6 }}>
+          O teu pedido foi enviado para o WhatsApp. Entraremos em contacto em breve com confirmação e prazo de produção.
+        </p>
+        <button
+          onClick={reset}
+          style={{
+            padding: "12px 28px",
+            borderRadius: 100,
+            border: "2px solid #3b82f6",
+            background: "#fff",
+            color: "#3b82f6",
+            fontWeight: 700,
+            fontSize: 15,
+            cursor: "pointer",
+          }}
+        >
           Fazer Nova Encomenda
         </button>
       </div>
@@ -546,32 +940,77 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
 
   return (
     <div>
-      {/* AI Design Generator — shown at top before step flow */}
-      {step === 0 && (
-        <AIDesignPanel onSuggestion={(text) => {
-          // Auto-extract theme if AI mentions common terms
-          const lower = text.toLowerCase()
-          if (!theme) {
-            const themes = ["frozen", "princesa", "unicórnio", "dinossauro", "flores", "boho", "minimalista", "super-herói"]
-            const found = themes.find(t => lower.includes(t))
-            if (found) setTheme(found.charAt(0).toUpperCase() + found.slice(1))
-          }
-        }} />
+      {initialReference && (
+        <div
+          style={{
+            background: "linear-gradient(135deg,#eff6ff,#dbeafe)",
+            border: "1.5px solid #bfdbfe",
+            borderRadius: 18,
+            padding: 16,
+            marginBottom: 20,
+            display: "flex",
+            gap: 14,
+            alignItems: "center",
+          }}
+        >
+          <img
+            src={initialReference.image}
+            alt={initialReference.name}
+            style={{ width: 72, height: 72, borderRadius: 14, objectFit: "cover", flexShrink: 0 }}
+          />
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "#3b82f6", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              Referência base
+            </div>
+            <div style={{ fontWeight: 800, color: "#1e3a5f", fontSize: 18 }}>
+              {initialReference.emoji} {initialReference.name}
+            </div>
+            <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>{initialReference.desc}</div>
+          </div>
+        </div>
       )}
 
-      {/* Live preview toggle button (visible after step 1) */}
+      {step === 0 && (
+        <AIDesignPanel
+          onSuggestion={(text) => {
+            const lower = text.toLowerCase()
+            if (!theme) {
+              const themes = ["frozen", "princesa", "unicórnio", "dinossauro", "flores", "boho", "minimalista", "super-herói"]
+              const found = themes.find((t) => lower.includes(t))
+              if (found) setTheme(found.charAt(0).toUpperCase() + found.slice(1))
+            }
+            if (initialReference && !notes.includes("IA")) {
+              setNotes((prev) =>
+                `${prev}\n\nSugestão IA baseada em ${initialReference.name}:\n${text}`.trim()
+              )
+            }
+          }}
+        />
+      )}
+
       {step >= 1 && (
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
           <button
-            onClick={() => setShowPreview(p => !p)}
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 16px", borderRadius: 100, border: "1.5px solid #bfdbfe", background: showPreview ? "#eff6ff" : "#fff", color: "#3b82f6", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.18s" }}
+            onClick={() => setShowPreview((p) => !p)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "7px 16px",
+              borderRadius: 100,
+              border: "1.5px solid #bfdbfe",
+              background: showPreview ? "#eff6ff" : "#fff",
+              color: "#3b82f6",
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+            }}
           >
             {showPreview ? "Ocultar pré-visualização" : "Ver pré-visualização"}
           </button>
         </div>
       )}
 
-      {/* Preview panel */}
       {showPreview && step >= 1 && (
         <div style={{ marginBottom: 24 }}>
           <SVGPreview name={name} age={age} theme={theme} colorHex={colorHex} size={size} material={material} />
@@ -580,238 +1019,378 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
 
       <StepDots total={TOTAL_STEPS} current={step} />
 
-      {/* Step 0 — Event */}
       {step === 0 && (
         <div>
-          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>Qual é o evento?</h3>
-          <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>Escolhe o tipo de celebração para o teu topo de bolo.</p>
+          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>
+            Qual é o evento?
+          </h3>
+          <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>
+            Escolhe o tipo de celebração para o teu topo de bolo.
+          </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {EVENTS.map(e => (
-              <button key={e} onClick={() => setEvent(e)} style={chipStyle(event === e)}>{e}</button>
+            {EVENTS.map((e) => (
+              <button key={e} onClick={() => setEvent(e)} style={chipStyle(event === e)}>
+                {e}
+              </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Step 1 — Name + Age */}
       {step === 1 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>Personalização</h3>
-            <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>Indica os dados que devem aparecer no topo.</p>
+            <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>
+              Personalização
+            </h3>
+            <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>
+              Indica os dados que devem aparecer no topo.
+            </p>
           </div>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Nome *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Maria" style={inputStyle} />
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+              Nome *
+            </label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Maria" style={inputStyle} />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Idade</label>
-            <input value={age} onChange={e => setAge(e.target.value)} placeholder="Ex: 5 anos" style={inputStyle} />
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+              Idade
+            </label>
+            <input value={age} onChange={(e) => setAge(e.target.value)} placeholder="Ex: 5 anos" style={inputStyle} />
           </div>
         </div>
       )}
 
-      {/* Step 2 — Theme + Colors */}
       {step === 2 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
-            <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>Tema e Cores</h3>
-            <p style={{ color: "#64748b", fontSize: 14, marginBottom: 4 }}>Define o estilo do teu topo de bolo.</p>
+            <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>
+              Tema e Cores
+            </h3>
+            <p style={{ color: "#64748b", fontSize: 14, marginBottom: 4 }}>
+              Define o estilo do teu topo de bolo.
+            </p>
           </div>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>Tema</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8 }}>
+              Tema
+            </label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-              {["Princesas", "Dinossauros", "Flores", "Boho", "Minimalista", "Super-Heróis", "Unicórnios", "Balões", "Estrelas"].map(t => (
-                <button key={t} onClick={() => setTheme(t)} style={chipStyle(theme === t)}>{t}</button>
+              {["Princesas", "Dinossauros", "Flores", "Boho", "Minimalista", "Super-Heróis", "Unicórnios", "Balões", "Estrelas"].map((t) => (
+                <button key={t} onClick={() => setTheme(t)} style={chipStyle(theme === t)}>
+                  {t}
+                </button>
               ))}
             </div>
-            <input value={theme} onChange={e => setTheme(e.target.value)} placeholder="Ou escreve o teu tema..." style={inputStyle} />
+            <input value={theme} onChange={(e) => setTheme(e.target.value)} placeholder="Ou escreve o teu tema..." style={inputStyle} />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>Cores</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8 }}>
+              Cores
+            </label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-              {COLOR_PRESETS.map(c => (
-                <button key={c.value} onClick={() => setColors(c.value)} style={{ ...chipStyle(colors === c.value), display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ width: 14, height: 14, borderRadius: "50%", background: c.hex, display: "inline-block", border: "1.5px solid rgba(0,0,0,0.08)" }} />
+              {COLOR_PRESETS.map((c) => (
+                <button
+                  key={c.value}
+                  onClick={() => setColors(c.value)}
+                  style={{ ...chipStyle(colors === c.value), display: "flex", alignItems: "center", gap: 6 }}
+                >
+                  <span
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: "50%",
+                      background: c.hex,
+                      display: "inline-block",
+                      border: "1.5px solid rgba(0,0,0,0.08)",
+                    }}
+                  />
                   {c.label}
                 </button>
               ))}
             </div>
-            <input value={colors} onChange={e => setColors(e.target.value)} placeholder="Ou descreve as cores..." style={inputStyle} />
+            <input value={colors} onChange={(e) => setColors(e.target.value)} placeholder="Ou descreve as cores..." style={inputStyle} />
           </div>
         </div>
       )}
 
-      {/* Step 3 — Size + Material */}
       {step === 3 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div>
-            <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>Tamanho e Material</h3>
-            <p style={{ color: "#64748b", fontSize: 14, marginBottom: 4 }}>Escolhe as opções para o teu topo.</p>
+            <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>
+              Tamanho e Material
+            </h3>
+            <p style={{ color: "#64748b", fontSize: 14, marginBottom: 4 }}>
+              Escolhe as opções para o teu topo.
+            </p>
           </div>
+
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.06em" }}>Tamanho</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 12 }}>
+              Tamanho
+            </label>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-              {SIZES.map(s => (
-                <button key={s.label} onClick={() => setSize(s.label)} style={{ padding: "14px 10px", borderRadius: 14, border: `2px solid ${size === s.label ? "#3b82f6" : "#bfdbfe"}`, background: size === s.label ? "#eff6ff" : "#fff", cursor: "pointer", textAlign: "center", transition: "all 0.18s" }}>
+              {SIZES.map((s) => (
+                <button
+                  key={s.label}
+                  onClick={() => setSize(s.label)}
+                  style={{
+                    padding: "14px 10px",
+                    borderRadius: 14,
+                    border: `2px solid ${size === s.label ? "#3b82f6" : "#bfdbfe"}`,
+                    background: size === s.label ? "#eff6ff" : "#fff",
+                    cursor: "pointer",
+                    textAlign: "center",
+                  }}
+                >
                   <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 15 }}>{s.label}</div>
                   <div style={{ fontSize: 12, color: "#64748b", marginTop: 3 }}>{s.desc}</div>
-           
                 </button>
               ))}
             </div>
           </div>
+
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.06em" }}>Material</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 12 }}>
+              Material
+            </label>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {MATERIALS.map(m => (
-                <button key={m.label} onClick={() => setMaterial(m.label)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderRadius: 12, border: `2px solid ${material === m.label ? "#3b82f6" : "#bfdbfe"}`, background: material === m.label ? "#eff6ff" : "#fff", cursor: "pointer", textAlign: "left", transition: "all 0.18s" }}>
-                  <div>
-                    <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14 }}>{m.label}</div>
-                    <div style={{ fontSize: 12, color: "#64748b" }}>{m.desc}</div>
+              {MATERIALS.map((m) => (
+                <button
+                  key={m.label}
+                  onClick={() => setMaterial(m.label)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "14px 18px",
+                    borderRadius: 12,
+                    border: `2px solid ${material === m.label ? "#3b82f6" : "#bfdbfe"}`,
+                    background: material === m.label ? "#eff6ff" : "#fff",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    gap: 12,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <img
+                      src={m.image}
+                      alt={m.label}
+                      style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 10, flexShrink: 0 }}
+                    />
+                    <div>
+                      <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14 }}>{m.label}</div>
+                      <div style={{ fontSize: 12, color: "#64748b" }}>{m.desc}</div>
+                    </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    
-                    {material === m.label && <span style={{ color: "#3b82f6" }}><CheckIcon /></span>}
-                  </div>
+                  {material === m.label && (
+                    <span style={{ color: "#3b82f6" }}>
+                      <CheckIcon />
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
-          </div>
-          {/* Live price breakdown */}
-          <div style={{ background: "linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius: 16, padding: "18px 20px", border: "1.5px solid #bfdbfe" }}>
-            <div
-  style={{
-    background: "linear-gradient(135deg,#eff6ff,#dbeafe)",
-    borderRadius: 16,
-    padding: "18px 20px",
-    border: "1.5px solid #bfdbfe",
-  }}
->
-  <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14, marginBottom: 8 }}>
-    Valores desde
-  </div>
-
-  <div
-    style={{
-      fontSize: 32,
-      fontWeight: 800,
-      color: "#1e3a5f",
-      marginBottom: 8,
-      fontFamily: "'Playfair Display', Georgia, serif",
-    }}
-  >
-    7,90€
-  </div>
-
-  <p style={{ fontSize: 13, color: "#475569", lineHeight: 1.6, margin: 0 }}>
-    O orçamento final será enviado via WhatsApp conforme a personalização,
-    materiais escolhidos e complexidade do trabalho.
-  </p>
-</div>
-            <div style={{ borderTop: "1.5px solid #bfdbfe", marginTop: 10, paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontWeight: 700, color: "#475569", fontSize: 14 }}>Valores desde</span>
-              <span style={{ fontSize: 28, fontWeight: 800, color: "#1e3a5f", fontFamily: "'Playfair Display',Georgia,serif" }}>{price.toFixed(2).replace(".", ",")}€</span>
-            </div>
-            <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 8 }}>Preço final confirmado via WhatsApp conforme personalização.</p>
           </div>
         </div>
       )}
 
-      {/* Step 4 — Image */}
       {step === 4 && (
         <div>
-          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>Imagem de Inspiração</h3>
-          <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>Podes enviar uma foto ou imagem de inspiração (opcional).</p>
+          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>
+            Imagem de Inspiração
+          </h3>
+          <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>
+            Podes enviar uma foto ou imagem de inspiração.
+          </p>
+
           <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={handleFile} style={{ display: "none" }} id="cfg-upload" />
+
           {!imagePreview ? (
-            <label htmlFor="cfg-upload" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, border: "2px dashed #bfdbfe", borderRadius: 16, padding: "40px 24px", cursor: "pointer", background: "#f8faff", textAlign: "center", transition: "border-color 0.2s" }}>
+            <label
+              htmlFor="cfg-upload"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 12,
+                border: "2px dashed #bfdbfe",
+                borderRadius: 16,
+                padding: "40px 24px",
+                cursor: "pointer",
+                background: "#f8faff",
+                textAlign: "center",
+              }}
+            >
               <div style={{ fontSize: 40 }}>🖼️</div>
               <div style={{ fontWeight: 700, color: "#3b82f6", fontSize: 15 }}>Clica para carregar imagem</div>
               <div style={{ fontSize: 13, color: "#94a3b8" }}>PNG, JPG ou WEBP até 10 MB</div>
             </label>
           ) : (
             <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", border: "2px solid #bfdbfe" }}>
-              <img src={imagePreview} alt="Imagem de inspiração carregada" style={{ width: "100%", maxHeight: 240, objectFit: "cover", display: "block" }} />
-              <button onClick={() => { setImagePreview(undefined); if (fileRef.current) fileRef.current.value = "" }} style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,0.55)", color: "#fff", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }} aria-label="Remover imagem">✕</button>
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top,rgba(0,0,0,0.5),transparent)", padding: "16px 14px 10px", color: "#fff", fontSize: 13, fontWeight: 600 }}>Imagem carregada com sucesso</div>
+              <img src={imagePreview} alt="Imagem de inspiração" style={{ width: "100%", maxHeight: 240, objectFit: "cover", display: "block" }} />
+              <button
+                onClick={() => {
+                  setImagePreview(undefined)
+                  if (fileRef.current) fileRef.current.value = ""
+                }}
+                style={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  background: "rgba(0,0,0,0.55)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: 32,
+                  height: 32,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
             </div>
           )}
-          <p style={{ marginTop: 12, fontSize: 13, color: "#94a3b8", textAlign: "center" }}>
-            Podes avançar sem imagem — indica o tema e as cores no passo anterior.
-          </p>
         </div>
       )}
 
-      {/* Step 5 — Notes */}
       {step === 5 && (
         <div>
-          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>Notas Extras</h3>
-          <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>Algum pedido especial? Detalhes adicionais? Conta-nos tudo.</p>
-          <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={4} placeholder="Ex: quero o nome em letra cursiva, cor rosa pastel com estrelas douradas..." style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} />
+          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22, color: "#1e3a5f", marginBottom: 8 }}>
+            Notas Extras
+          </h3>
+          <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>
+            Algum pedido especial? Conta-nos tudo.
+          </p>
 
-          {/* Live preview in summary */}
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={5}
+            placeholder="Ex: quero o nome em letra cursiva..."
+            style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
+          />
+
           <div style={{ marginTop: 24, marginBottom: 20 }}>
             <SVGPreview name={name} age={age} theme={theme} colorHex={colorHex} size={size} material={material} />
           </div>
 
-          {/* Order Summary */}
           <div style={{ background: "#eff6ff", borderRadius: 16, padding: "20px 22px", border: "1.5px solid #bfdbfe" }}>
-            <div style={{ fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 14, fontFamily: "'Playfair Display',Georgia,serif" }}>Resumo do pedido</div>
+            <div style={{ fontWeight: 800, color: "#1e3a5f", fontSize: 15, marginBottom: 14, fontFamily: "'Playfair Display',Georgia,serif" }}>
+              Resumo do pedido
+            </div>
+
+            {initialReference && (
+              <div style={{ display: "flex", gap: 12, fontSize: 14, marginBottom: 7 }}>
+                <span style={{ fontWeight: 700, color: "#3b82f6", minWidth: 100 }}>Referência:</span>
+                <span style={{ color: "#1e3a5f" }}>{initialReference.name}</span>
+              </div>
+            )}
+
             {[
-              ["Evento",    event],
-              ["Nome",      name  || "—"],
-              ["Idade",     age   || "—"],
-              ["Tema",      theme || "—"],
-              ["Cores",     colors || "—"],
-              ["Tamanho",   size],
-              ["Material",  material],
-              ["Notas",     notes || "—"],
+              ["Evento", event],
+              ["Nome", name || "—"],
+              ["Idade", age || "—"],
+              ["Tema", theme || "—"],
+              ["Cores", colors || "—"],
+              ["Tamanho", size],
+              ["Material", material],
+              ["Notas", notes || "—"],
             ].map(([label, val]) => (
               <div key={label} style={{ display: "flex", gap: 12, fontSize: 14, marginBottom: 7, alignItems: "flex-start" }}>
-                <span style={{ fontWeight: 700, color: "#3b82f6", minWidth: 80 }}>{label}:</span>
+                <span style={{ fontWeight: 700, color: "#3b82f6", minWidth: 100 }}>{label}:</span>
                 <span style={{ color: "#1e3a5f" }}>{val}</span>
               </div>
             ))}
-            {imagePreview && (
-              <div style={{ display: "flex", gap: 12, fontSize: 14, marginBottom: 7, alignItems: "center" }}>
-                <span style={{ fontWeight: 700, color: "#3b82f6", minWidth: 80 }}>Imagem:</span>
-                <img src={imagePreview} alt="Miniatura da imagem de referência" style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, border: "1.5px solid #bfdbfe" }} />
-              </div>
-            )}
-            <div style={{ borderTop: "1.5px solid #bfdbfe", marginTop: 14, paddingTop: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontWeight: 700, color: "#475569", fontSize: 14 }}>Valores desde</span>
-                <span style={{ fontWeight: 800, color: "#1e3a5f", fontSize: 22, fontFamily: "'Playfair Display',Georgia,serif" }}>7,90€</span>
-              </div>
-              <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 6 }}>
-                O orçamento final será enviado via WhatsApp conforme a personalização e complexidade do trabalho.
-              </p>
-            </div>
-          </div>
 
-          {/* Action buttons */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 20 }}>
-            <button onClick={handleSend} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "15px 24px", borderRadius: 100, background: "#25d366", color: "#fff", fontWeight: 800, fontSize: 16, border: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(37,211,102,0.35)", transition: "all 0.2s" }}>
-              <WaIcon size={20} />
-              Enviar pedido no WhatsApp
-            </button>
-            <button onClick={handleAddToCart} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "13px 24px", borderRadius: 100, background: "#fff", color: "#3b82f6", fontWeight: 700, fontSize: 15, border: "2px solid #3b82f6", cursor: "pointer", transition: "all 0.2s" }}>
-              <CartIcon size={17} />
-              Adicionar ao carrinho
-            </button>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 20 }}>
+              <button
+                onClick={handleSend}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
+                  padding: "15px 24px",
+                  borderRadius: 100,
+                  background: "#25d366",
+                  color: "#fff",
+                  fontWeight: 800,
+                  fontSize: 16,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <WaIcon size={20} />
+                Enviar pedido no WhatsApp
+              </button>
+
+              <button
+                onClick={handleAddToCart}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  padding: "13px 24px",
+                  borderRadius: 100,
+                  background: "#fff",
+                  color: "#3b82f6",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  border: "2px solid #3b82f6",
+                  cursor: "pointer",
+                }}
+              >
+                <CartIcon size={17} />
+                Adicionar ao carrinho
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Navigation */}
       {step < TOTAL_STEPS - 1 && (
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 28 }}>
-          <button onClick={() => setStep(s => Math.max(0, s - 1))} style={{ padding: "10px 20px", borderRadius: 100, border: "2px solid #bfdbfe", background: "#fff", color: "#475569", fontWeight: 600, fontSize: 14, cursor: step === 0 ? "not-allowed" : "pointer", opacity: step === 0 ? 0.4 : 1, transition: "all 0.2s" }} disabled={step === 0}>
+          <button
+            onClick={() => setStep((s) => Math.max(0, s - 1))}
+            disabled={step === 0}
+            style={{
+              padding: "10px 20px",
+              borderRadius: 100,
+              border: "2px solid #bfdbfe",
+              background: "#fff",
+              color: "#475569",
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: step === 0 ? "not-allowed" : "pointer",
+              opacity: step === 0 ? 0.4 : 1,
+            }}
+          >
             Voltar
           </button>
-          <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>Passo {step + 1} de {TOTAL_STEPS}</span>
-          <button onClick={() => setStep(s => s + 1)} disabled={!canNext()} style={{ padding: "10px 24px", borderRadius: 100, border: "none", background: canNext() ? "#3b82f6" : "#bfdbfe", color: canNext() ? "#fff" : "#94a3b8", fontWeight: 700, fontSize: 14, cursor: canNext() ? "pointer" : "not-allowed", display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
+          <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>
+            Passo {step + 1} de {TOTAL_STEPS}
+          </span>
+          <button
+            onClick={() => setStep((s) => s + 1)}
+            disabled={!canNext()}
+            style={{
+              padding: "10px 24px",
+              borderRadius: 100,
+              border: "none",
+              background: canNext() ? "#3b82f6" : "#bfdbfe",
+              color: canNext() ? "#fff" : "#94a3b8",
+              fontWeight: 700,
+              fontSize: 14,
+              cursor: canNext() ? "pointer" : "not-allowed",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
             Continuar <ArrowRight />
           </button>
         </div>
@@ -900,11 +1479,22 @@ function CartPanel({ items, onRemove, onClose }: { items: CartItem[]; onRemove: 
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Page() {
-  const [menuOpen, setMenuOpen]   = useState(false)
-  const [scrolled, setScrolled]   = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<ProductReference | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
+  const [configReference, setConfigReference] = useState<ProductReference | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
-  const [cartOpen, setCartOpen]   = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
   const [cartItems, setCartItems] = useState<CartItem[]>([])
+
+  const handleCustomizeFromCategory = (item: ProductReference) => {
+    setConfigReference(item)
+    setDetailsOpen(false)
+    setTimeout(() => {
+      document.getElementById("personalizar")?.scrollIntoView({ behavior: "smooth" })
+    }, 120)
+  }
 
   const WA_BUSINESS = waLink("Olá, gostaria de receber a tabela de preços para empresas.")
 
@@ -912,11 +1502,13 @@ export default function Page() {
     const onScroll = () => {
       setScrolled(window.scrollY > 50)
       const sections = ["home", "personalizar", "categorias", "galeria", "precos", "sobre", "contacto"]
+
       for (const id of sections) {
         const el = document.getElementById(id)
         if (el && el.getBoundingClientRect().top <= 120) setActiveSection(id)
       }
     }
+
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
@@ -927,12 +1519,13 @@ export default function Page() {
   }
 
   const addToCart = (item: CartItem) => {
-    setCartItems(prev => [...prev, item])
+    setCartItems((prev) => [...prev, item])
     setCartOpen(true)
   }
 
-  const removeFromCart = (id: string) => setCartItems(prev => prev.filter(i => i.id !== id))
-
+  const removeFromCart = (id: string) => {
+    setCartItems((prev) => prev.filter((i) => i.id !== id))
+  }
   const navLinks = [
     { id: "home",        label: "Início" },
     { id: "personalizar",label: "Personalizar" },
@@ -1148,7 +1741,7 @@ export default function Page() {
 
           <Reveal delay={100}>
             <div style={{ background: "#fff", borderRadius: 28, padding: "clamp(28px,5vw,52px)", boxShadow: "0 16px 56px rgba(30,58,95,0.10)", border: "1.5px solid #e0effe" }}>
-              <Configurator onAddToCart={addToCart} />
+              <Configurator onAddToCart={addToCart} initialReference={configReference} />
             </div>
           </Reveal>
         </div>
@@ -1165,39 +1758,125 @@ export default function Page() {
             </div>
           </Reveal>
           <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
-            {CATEGORIES.map((cat, i) => (
-              <Reveal key={cat.id} delay={i * 60}>
-                <div className="cat-card" style={{ background: "#fff", borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 20px rgba(30,58,95,0.08)", border: "1.5px solid #e0effe" }}>
-                  <div style={{ position: "relative" }}>
-                    <img
-  src={cat.image}
-  alt={`Exemplo de topo de bolo para ${cat.name} feito artesanalmente`}
-  style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }}
-/>
-                    {cat.badge && <div style={{ position: "absolute", top: 10, right: 10, background: "#3b82f6", color: "#fff", borderRadius: 100, padding: "3px 10px", fontSize: 11, fontWeight: 800 }}>{cat.badge}</div>}
-                    <div style={{ position: "absolute", top: 10, left: 10, background: "rgba(255,255,255,0.92)", borderRadius: 100, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "#3b82f6" }}>Desde {cat.price}€</div>
-                  </div>
-                  <div style={{ padding: "16px 18px 20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      <span style={{ fontSize: 20 }}>{cat.emoji}</span>
-                      <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 17, color: "#1e3a5f", fontWeight: 600 }}>{cat.name}</h3>
-                    </div>
-                    <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.5, marginBottom: 14 }}>{cat.desc}</p>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      <button onClick={() => scrollTo("personalizar")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px 0", borderRadius: 10, background: "#3b82f6", color: "#fff", fontWeight: 700, fontSize: 13, border: "none", cursor: "pointer", transition: "background 0.2s" }}>
-                        Personalizar este modelo
-                      </button>
-                      <a href={waLink(`Olá! Encontrei o topo de ${cat.name} no vosso site e gostaria de encomendar. Podem ajudar?`)} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 0", borderRadius: 10, background: "#fff", color: "#25d366", fontWeight: 700, fontSize: 13, border: "1.5px solid #25d366", textDecoration: "none", transition: "all 0.2s" }}>
-                        <WaIcon size={13} /> Enviar referência no WhatsApp
-                      </a>
-                    </div>
-                    <p style={{ fontSize: 11, color: "#94a3b8", lineHeight: 1.5, marginTop: 6, textAlign: "center" }}>
-                      Não é exatamente o que procuras? Envia-nos esta referência e criamos um design personalizado para ti.
-                    </p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
+            {CATEGORIES.map((cat) => (
+  <div
+    key={cat.id}
+    className="cat-card"
+    onClick={() => {
+      setSelectedCategory(cat)
+      setDetailsOpen(true)
+    }}
+    style={{
+      background: "#fff",
+      borderRadius: 24,
+      border: "1.5px solid #dbeafe",
+      overflow: "hidden",
+      boxShadow: "0 8px 32px rgba(30,58,95,0.08)",
+      transition: "all 0.25s ease",
+      cursor: "pointer",
+    }}
+  >
+    <div style={{ position: "relative" }}>
+      <img
+        src={cat.image}
+        alt={cat.name}
+        style={{ width: "100%", height: 190, objectFit: "cover", display: "block" }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          background: "rgba(255,255,255,0.95)",
+          color: "#3b82f6",
+          borderRadius: 100,
+          padding: "6px 12px",
+          fontSize: 12,
+          fontWeight: 800,
+        }}
+      >
+        Desde {cat.price}€
+      </div>
+
+      {cat.badge && (
+        <div
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            background: "#3b82f6",
+            color: "#fff",
+            borderRadius: 100,
+            padding: "6px 12px",
+            fontSize: 12,
+            fontWeight: 800,
+          }}
+        >
+          {cat.badge}
+        </div>
+      )}
+    </div>
+
+    <div style={{ padding: 22 }}>
+      <h3
+        style={{
+          fontFamily: "'Playfair Display',Georgia,serif",
+          fontSize: 20,
+          color: "#1e3a5f",
+          marginBottom: 8,
+        }}
+      >
+        {cat.emoji} {cat.name}
+      </h3>
+
+      <p style={{ color: "#64748b", fontSize: 15, lineHeight: 1.6, minHeight: 74 }}>
+        {cat.desc}
+      </p>
+
+      <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            handleCustomizeFromCategory(cat)
+          }}
+          style={{
+            padding: "13px 18px",
+            borderRadius: 14,
+            border: "none",
+            background: "#3b82f6",
+            color: "#fff",
+            fontWeight: 800,
+            fontSize: 15,
+            cursor: "pointer",
+          }}
+        >
+          Personalizar este modelo
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            setSelectedCategory(cat)
+            setDetailsOpen(true)
+          }}
+          style={{
+            padding: "13px 18px",
+            borderRadius: 14,
+            border: "2px solid #bfdbfe",
+            background: "#fff",
+            color: "#3b82f6",
+            fontWeight: 800,
+            fontSize: 15,
+            cursor: "pointer",
+          }}
+        >
+          Ver detalhes
+        </button>
+      </div>
+    </div>
+  </div>
+))}
           </div>
           <Reveal delay={200}>
             <div style={{ marginTop: 36, background: "#eff6ff", borderRadius: 18, padding: "20px 28px", textAlign: "center", border: "1.5px solid #bfdbfe" }}>
@@ -1498,7 +2177,7 @@ export default function Page() {
       {cartOpen && <CartPanel items={cartItems} onRemove={removeFromCart} onClose={() => setCartOpen(false)} />}
 
       {/* ── AI CHAT WIDGET ───────────────────────────────────────────────────────────────── */}
-      <AIChatWidget />
+      <AIChatWidget/>
     </div>
   )
 }
