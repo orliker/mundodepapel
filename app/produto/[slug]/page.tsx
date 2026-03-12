@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { Star, ShoppingBag, Sparkles, ChevronLeft, ChevronRight, Minus, Plus, Check, MessageCircle } from 'lucide-react'
+import { Star, Sparkles, ChevronLeft, ChevronRight, Minus, Plus, Check, MessageCircle } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { ProductCard } from '@/components/product-card'
+import ProductCard from '@/components/product-card'
 import { CustomDesignModal } from '@/components/custom-design-modal'
 import { AIChatWidget } from '@/components/ai-chat-widget'
 import { products, reviews } from '@/lib/data'
@@ -17,11 +17,10 @@ export default function ProductPage() {
   const product = products.find((p) => p.slug === slug)
 
   const [imgIdx, setImgIdx] = useState(0)
-  const [selectedMaterial, setSelectedMaterial] = useState(product?.materials[0] ?? 'acrílico')
+  const [selectedMaterial, setSelectedMaterial] = useState(product?.materials[0] ?? 'papel-couche-250g')
   const [selectedSize, setSelectedSize] = useState(product?.sizes[0] ?? '')
   const [quantity, setQuantity] = useState(1)
   const [cartCount, setCartCount] = useState(0)
-  const [added, setAdded] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [tab, setTab] = useState<'info' | 'specs' | 'reviews'>('info')
 
@@ -34,7 +33,9 @@ export default function ProductPage() {
         <Navbar />
         <main className="min-h-screen bg-[var(--cream)] flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-4xl font-light mb-4" style={{ fontFamily: 'var(--font-display)' }}>Produto não encontrado</h1>
+            <h1 className="text-4xl font-light mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+              Produto não encontrado
+            </h1>
             <Link href="/catalogo" className="text-sm text-[var(--charcoal-light)] underline font-[var(--font-body)]">
               Voltar ao catálogo
             </Link>
@@ -45,24 +46,25 @@ export default function ProductPage() {
     )
   }
 
-  const handleAdd = () => {
-    setAdded(true)
-    setCartCount((c) => c + 1)
-    setTimeout(() => setAdded(false), 2000)
-  }
+  const whatsappHref = `https://wa.me/351900000000?text=${encodeURIComponent(
+    `Olá! Quero pedir orçamento para o modelo "${product.name}". Material: ${selectedMaterial}. Tamanho: ${selectedSize}. Quantidade: ${quantity}.`
+  )}`
 
   return (
     <>
       <Navbar cartCount={cartCount} />
 
       <main className="bg-[var(--cream)] min-h-screen">
-        {/* Breadcrumb */}
         <div className="border-b border-[var(--border)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <nav className="flex items-center gap-2 text-xs text-[var(--charcoal-light)] font-[var(--font-body)]">
-              <Link href="/" className="hover:text-[var(--charcoal)] transition-colors">Início</Link>
+              <Link href="/" className="hover:text-[var(--charcoal)] transition-colors">
+                Início
+              </Link>
               <span>/</span>
-              <Link href="/catalogo" className="hover:text-[var(--charcoal)] transition-colors">Catálogo</Link>
+              <Link href="/catalogo" className="hover:text-[var(--charcoal)] transition-colors">
+                Catálogo
+              </Link>
               <span>/</span>
               <Link href={`/catalogo?categoria=${product.category}`} className="hover:text-[var(--charcoal)] transition-colors capitalize">
                 {product.category}
@@ -73,18 +75,16 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Product */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
-            {/* Images */}
             <div className="space-y-3">
-              {/* Main image */}
               <div className="relative overflow-hidden bg-[var(--cream-dark)] aspect-square">
                 <img
                   src={product.images[imgIdx]}
                   alt={`${product.name} — vista ${imgIdx + 1}`}
                   className="w-full h-full object-cover"
                 />
+
                 {product.images.length > 1 && (
                   <>
                     <button
@@ -94,6 +94,7 @@ export default function ProductPage() {
                     >
                       <ChevronLeft size={16} />
                     </button>
+
                     <button
                       onClick={() => setImgIdx((i) => (i + 1) % product.images.length)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-[var(--cream)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--charcoal)] hover:text-[var(--cream)] transition-colors"
@@ -103,13 +104,14 @@ export default function ProductPage() {
                     </button>
                   </>
                 )}
+
                 {product.isBestseller && (
                   <div className="absolute top-4 left-4 bg-[var(--gold)] text-[var(--charcoal)] text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 font-[var(--font-body)]">
                     Bestseller
                   </div>
                 )}
               </div>
-              {/* Thumbnails */}
+
               {product.images.length > 1 && (
                 <div className="flex gap-2">
                   {product.images.map((img, i) => (
@@ -129,27 +131,27 @@ export default function ProductPage() {
               )}
             </div>
 
-            {/* Info & Configurator */}
             <div className="flex flex-col gap-6">
-              {/* Category & Name */}
               <div>
                 <p className="text-[10px] tracking-[0.3em] uppercase text-[var(--gold)] font-[var(--font-body)] mb-1 capitalize">
                   {product.category}
                 </p>
+
                 <h1 className="text-4xl font-light text-[var(--charcoal)] mb-3" style={{ fontFamily: 'var(--font-display)' }}>
                   {product.name}
                 </h1>
 
-                {/* Rating */}
                 <div className="flex items-center gap-3">
                   <div className="flex gap-0.5">
-                    {Array(5).fill(null).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={13}
-                        className={i < Math.floor(product.rating) ? 'text-[var(--gold)] fill-[var(--gold)]' : 'text-[var(--border)]'}
-                      />
-                    ))}
+                    {Array(5)
+                      .fill(null)
+                      .map((_, i) => (
+                        <Star
+                          key={i}
+                          size={13}
+                          className={i < Math.floor(product.rating) ? 'text-[var(--gold)] fill-[var(--gold)]' : 'text-[var(--border)]'}
+                        />
+                      ))}
                   </div>
                   <span className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
                     {product.rating} · {product.reviewCount} avaliações
@@ -157,24 +159,28 @@ export default function ProductPage() {
                 </div>
               </div>
 
-              {/* Price */}
-              <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-medium text-[var(--charcoal)]" style={{ fontFamily: 'var(--font-display)' }}>
-                  {product.price}€
-                </span>
-                {product.comparePrice && (
-                  <span className="text-lg text-[var(--charcoal-light)] line-through font-[var(--font-body)]">
-                    {product.comparePrice}€
-                  </span>
-                )}
-                <span className="text-xs text-[var(--charcoal-light)] font-[var(--font-body)]">por unidade · IVA incluído</span>
+              <div className="space-y-2">
+                <p
+                  className="text-2xl font-medium text-[var(--charcoal)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  Valores desde 7,99€
+                </p>
+
+                <p className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
+                  O orçamento final será enviado via WhatsApp conforme a personalização e complexidade do trabalho.
+                </p>
+
+                <p className="text-xs text-[var(--charcoal-light)] font-[var(--font-body)] uppercase tracking-widest">
+                  100% personalizável
+                </p>
               </div>
 
-              {/* Material selector */}
               <div>
                 <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] font-[var(--font-body)] mb-2.5">
                   Material: <strong className="text-[var(--charcoal)] capitalize">{selectedMaterial}</strong>
                 </p>
+
                 <div className="flex gap-2 flex-wrap">
                   {product.materials.map((m) => (
                     <button
@@ -193,11 +199,11 @@ export default function ProductPage() {
                 </div>
               </div>
 
-              {/* Size selector */}
               <div>
                 <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] font-[var(--font-body)] mb-2.5">
                   Tamanho: <strong className="text-[var(--charcoal)]">{selectedSize}</strong>
                 </p>
+
                 <div className="flex gap-2 flex-wrap">
                   {product.sizes.map((s) => (
                     <button
@@ -216,9 +222,11 @@ export default function ProductPage() {
                 </div>
               </div>
 
-              {/* Quantity */}
               <div>
-                <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] font-[var(--font-body)] mb-2.5">Quantidade</p>
+                <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] font-[var(--font-body)] mb-2.5">
+                  Quantidade
+                </p>
+
                 <div className="inline-flex items-center border border-[var(--border)]">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -227,7 +235,9 @@ export default function ProductPage() {
                   >
                     <Minus size={13} />
                   </button>
+
                   <span className="w-12 text-center text-sm font-medium font-[var(--font-body)]">{quantity}</span>
+
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
                     className="w-10 h-10 flex items-center justify-center hover:bg-[var(--cream-dark)] transition-colors"
@@ -236,60 +246,37 @@ export default function ProductPage() {
                     <Plus size={13} />
                   </button>
                 </div>
+
                 <span className="ml-4 text-xs text-[var(--charcoal-light)] font-[var(--font-body)]">
-                  Total: <strong className="text-[var(--charcoal)]">{(product.price * quantity).toFixed(0)}€</strong>
+                  Total: <strong className="text-[var(--charcoal)]">Orçamento via WhatsApp</strong>
                 </span>
               </div>
 
-              {/* CTAs */}
               <div className="flex flex-col gap-3">
                 <button
-                  onClick={handleAdd}
-                  className={cn(
-                    'flex items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest uppercase font-[var(--font-body)] transition-all',
-                    added
-                      ? 'bg-[var(--gold)] text-[var(--charcoal)]'
-                      : 'bg-[var(--charcoal)] text-[var(--cream)] hover:bg-[var(--gold)] hover:text-[var(--charcoal)]'
-                  )}
-                >
-                  {added ? (
-                    <>
-                      <Check size={15} />
-                      Adicionado ao carrinho!
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag size={15} />
-                      Adicionar ao carrinho
-                    </>
-                  )}
-                </button>
-
-                <button
                   onClick={() => setModalOpen(true)}
-                  className="flex items-center justify-center gap-2 border border-[var(--charcoal)] text-[var(--charcoal)] py-4 text-sm font-bold tracking-widest uppercase font-[var(--font-body)] hover:bg-[var(--charcoal)] hover:text-[var(--cream)] transition-colors"
+                  className="flex items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest uppercase font-[var(--font-body)] transition-all bg-[var(--charcoal)] text-[var(--cream)] hover:bg-[var(--gold)] hover:text-[var(--charcoal)]"
                 >
                   <Sparkles size={15} />
-                  Personalizar com IA
+                  Personalizar este modelo
                 </button>
 
                 <a
-                  href={`https://wa.me/351900000000?text=Olá!%20Tenho%20interesse%20no%20${encodeURIComponent(product.name)}`}
+                  href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 bg-[var(--whatsapp)] text-[var(--whatsapp-fg)] py-4 text-sm font-bold tracking-widest uppercase font-[var(--font-body)] hover:opacity-90 transition-opacity"
                 >
                   <MessageCircle size={15} />
-                  Perguntar por WhatsApp
+                  Pedir orçamento no WhatsApp
                 </a>
               </div>
 
-              {/* Badges */}
               <div className="flex flex-wrap gap-3 pt-2 border-t border-[var(--border)]">
                 {[
-                  'Entrega 3-5 dias úteis',
+                  '100% personalizável',
                   'Envio seguro',
-                  'Pagamento 100% seguro',
+                  'Atendimento via WhatsApp',
                   'Feito em Portugal',
                 ].map((b) => (
                   <div key={b} className="flex items-center gap-1.5 text-xs text-[var(--charcoal-light)] font-[var(--font-body)]">
@@ -301,7 +288,6 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="mt-16">
             <div className="border-b border-[var(--border)] flex gap-0">
               {[
@@ -326,8 +312,11 @@ export default function ProductPage() {
 
             <div className="py-8 max-w-2xl">
               {tab === 'info' && (
-                <p className="text-sm text-[var(--charcoal)] leading-relaxed font-[var(--font-body)]">{product.description}</p>
+                <p className="text-sm text-[var(--charcoal)] leading-relaxed font-[var(--font-body)]">
+                  {product.description}
+                </p>
               )}
+
               {tab === 'specs' && (
                 <div className="space-y-3">
                   {[
@@ -335,9 +324,9 @@ export default function ProductPage() {
                     ['Materiais disponíveis', product.materials.join(', ')],
                     ['Tamanhos', product.sizes.join(', ')],
                     ['Tags', product.tags.join(', ')],
-                    ['Prazo de produção', '2-4 dias úteis'],
-                    ['Acabamento', 'Corte a laser de precisão'],
-                    ['Embalagem', 'Caixa premium anti-risco'],
+                    ['Orçamento', 'Enviado via WhatsApp'],
+                    ['Personalização', 'Nome, idade, tema, cores e referências'],
+                    ['Acabamento', 'Papelería premium e corte de precisão'],
                   ].map(([k, v]) => (
                     <div key={k} className="flex gap-4 py-2 border-b border-[var(--border)] text-sm font-[var(--font-body)]">
                       <span className="w-40 shrink-0 text-[var(--charcoal-light)] capitalize">{k}</span>
@@ -346,18 +335,23 @@ export default function ProductPage() {
                   ))}
                 </div>
               )}
+
               {tab === 'reviews' && (
                 <div className="space-y-4">
                   {productReviews.length > 0 ? (
                     productReviews.map((r) => (
                       <div key={r.id} className="border border-[var(--border)] p-4">
                         <div className="flex gap-0.5 mb-2">
-                          {Array(5).fill(null).map((_, i) => (
-                            <Star key={i} size={11} className="text-[var(--gold)] fill-[var(--gold)]" />
-                          ))}
+                          {Array(5)
+                            .fill(null)
+                            .map((_, i) => (
+                              <Star key={i} size={11} className="text-[var(--gold)] fill-[var(--gold)]" />
+                            ))}
                         </div>
                         <p className="text-sm text-[var(--charcoal)] font-[var(--font-body)] leading-relaxed">{`"${r.text}"`}</p>
-                        <p className="text-xs text-[var(--charcoal-light)] font-[var(--font-body)] mt-2">{r.author} · {r.date}</p>
+                        <p className="text-xs text-[var(--charcoal-light)] font-[var(--font-body)] mt-2">
+                          {r.author} · {r.date}
+                        </p>
                       </div>
                     ))
                   ) : (
@@ -370,15 +364,56 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* Related */}
-          {related.length > 0 && (
+                    {related.length > 0 && (
             <div className="mt-16 pt-16 border-t border-[var(--border)]">
-              <h2 className="text-3xl font-light text-[var(--charcoal)] mb-8" style={{ fontFamily: 'var(--font-display)' }}>
+              <h2
+                className="text-3xl font-light text-[var(--charcoal)] mb-8"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
                 Também podes gostar
               </h2>
+
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {related.map((p) => (
-                  <ProductCard key={p.id} product={p} onAddToCart={() => setCartCount((c) => c + 1)} />
+                  <Link
+                    key={p.id}
+                    href={`/produto/${p.slug}`}
+                    className="group block bg-white border border-[var(--border)] overflow-hidden hover:shadow-md transition-shadow"
+                  >
+                    <div className="aspect-square bg-[var(--cream-dark)] overflow-hidden">
+                      <img
+                        src={p.images[0]}
+                        alt={p.name}
+                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </div>
+
+                    <div className="p-4 space-y-2">
+                      <p className="text-[10px] tracking-[0.25em] uppercase text-[var(--gold)] font-[var(--font-body)] capitalize">
+                        {p.category}
+                      </p>
+
+                      <h3
+                        className="text-lg text-[var(--charcoal)]"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        {p.name}
+                      </h3>
+
+                      <p className="text-xs text-[var(--charcoal-light)] font-[var(--font-body)] line-clamp-2">
+                        {p.description}
+                      </p>
+
+                      <div className="pt-1 space-y-1">
+                        <p className="text-sm font-medium text-[var(--charcoal)]">
+                          Valores desde 7,99€
+                        </p>
+                        <p className="text-[11px] text-[var(--charcoal-light)] font-[var(--font-body)]">
+                          Orçamento final via WhatsApp
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>
