@@ -371,8 +371,7 @@ function Configurator() {
       "",
       "Obrigado!",
     ]
-    return lines.join("
-")
+    return lines.join("\n")
   }
 
   const handleSend = () => {
