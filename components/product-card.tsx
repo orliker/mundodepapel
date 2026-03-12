@@ -53,16 +53,16 @@ const REVIEWS = [
 ]
 
 const SIZES = [
-  { label: "Pequeno",  desc: "~10 cm" },
-  { label: "Médio",    desc: "~15 cm" },
-  { label: "Grande",   desc: "~20 cm" },
+  { label: "Pequeno", desc: "~10 cm" },
+  { label: "Médio", desc: "~15 cm" },
+  { label: "Grande", desc: "~20 cm" },
 ]
 
 const MATERIALS = [
-  { label: "Papel Couché 250g",             desc: "Base premium, acabamento suave" },
-  { label: "Papel Glitter",                 desc: "Brilho e sofisticação especial" },
-  { label: "Papel Texturizado",   desc: "Efeito aveludado e elegante" },
-  { label: "Papel Decorativo",     desc: "Papéis de papelaria de alta qualidade" },
+  { label: "Papel Couché 250g", desc: "Base premium, acabamento suave" },
+  { label: "Papel Glitter", desc: "Brilho e sofisticação especial" },
+  { label: "Papel Texturizado", desc: "Efeito aveludado e elegante" },
+  { label: "Papel Decorativo", desc: "Papéis de papelaria de alta qualidade" },
 ]
 
 const COLOR_PRESETS = [

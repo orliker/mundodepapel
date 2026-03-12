@@ -385,13 +385,7 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
       `Imagem de referência: ${imagePreview ? "(Em anexo)" : "Sem imagem"}`,
       `Notas: ${notes || "—"}`,
       "",
-      `--- Estimativa de preço ---`,
-      `Base: ${breakdown.base.toFixed(2).replace(".", ",")}€`,
-      ...(breakdown.name > 0     ? [`+ Nome: +${breakdown.name}€`]         : []),
-      ...(breakdown.age > 0      ? [`+ Idade: +${breakdown.age}€`]         : []),
-      ...(breakdown.size > 0     ? [`+ Tamanho: +${breakdown.size}€`]      : []),
-      ...(breakdown.material > 0 ? [`+ Material: +${breakdown.material}€`] : []),
-      `Total estimado: ${price}€`,
+`Total estimado: ${price}€`,
       "(Preço final confirmado após análise do design)",
       "",
       "Obrigado!",
@@ -588,7 +582,7 @@ function Configurator({ onAddToCart }: { onAddToCart: (item: CartItem) => void }
           </div>
           {/* Live price breakdown */}
           <div style={{ background: "linear-gradient(135deg,#eff6ff,#dbeafe)", borderRadius: 16, padding: "18px 20px", border: "1.5px solid #bfdbfe" }}>
-            <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14, marginBottom: 12 }}>Estimativa de preço</div>
+            <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14, marginBottom: 12 }}></div>
             {[
               ["Base",     `${breakdown.base.toFixed(2).replace(".", ",")}€`],
               ...(breakdown.name > 0 ? [["+ Nome personalizado", `+${breakdown.name}€`]] : []),
