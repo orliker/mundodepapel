@@ -12,11 +12,13 @@ interface CustomDesignModalProps {
 
 type Step = 'upload' | 'details' | 'contact' | 'preview' | 'success'
 
+const SELLER_WHATSAPP = '351000000000' // <- troca pelo número real da loja
+
 const MATERIALS: { value: Material; label: string; desc: string }[] = [
-  { value: 'acrílico', label: 'Acrílico', desc: 'Transparente ou espelhado, acabamento premium' },
-  { value: 'madeira', label: 'Madeira', desc: 'Corte a laser, look rústico ou natural' },
-  { value: 'cartão', label: 'Cartão', desc: 'Econômico, ideal para grandes quantidades' },
-  { value: 'misto', label: 'Misto', desc: 'Combinação de materiais sob consulta' },
+  { value: 'papel-couche-250g', label: 'Papel couché 250g', desc: 'Acabamento de alta qualidade, elegante e resistente' },
+  { value: 'papel-glitter', label: 'Papel glitter', desc: 'Ideal para um efeito brilhante e festivo' },
+  { value: 'papel-texturizado', label: 'Papel texturizado', desc: 'Papéis especiais com textura e acabamento premium' },
+  { value: 'papel-decorativo', label: 'Papel decorativo', desc: 'Outras opções de papelaria sob consulta' },
 ]
 
 export function CustomDesignModal({ open, onClose }: CustomDesignModalProps) {
@@ -36,8 +38,7 @@ export function CustomDesignModal({ open, onClose }: CustomDesignModalProps) {
     depth: '',
     diameter: '',
     quantity: '1',
-    suggestedPrice: '',
-    material: 'acrílico' as Material,
+    material: 'papel-couche-250g' as Material,
     notes: '',
     name: '',
     phone: '',
@@ -63,60 +64,33 @@ export function CustomDesignModal({ open, onClose }: CustomDesignModalProps) {
     if (file) handleFile(file)
   }
 
+  const getMaterialLabel = (value: Material) =>
+    MATERIALS.find((m) => m.value === value)?.label ?? value
+
   const generateVariants = async () => {
     setGenerating(true)
+
     try {
-      const prompt = `Cria 3 variantes de design para um topo de bolo personalizado.
-Material: ${form.material}. Medidas: ${form.height}x${form.width}cm. 
-Notas: ${form.notes || 'sem notas específicas'}.
-Descreve cada variante com: nome, estilo visual, cores principais, tipografia sugerida e detalhes decorativos.
-Responde em JSON com array "variants" com campos: id, name, style, colors, typography, details, estimatedPrice.`
+      const measureText = form.diameter
+        ? `diâmetro de ${form.diameter}cm`
+        : `${form.height || '?'}×${form.width || '?'}cm${form.depth ? ` com profundidade de ${form.depth}cm` : ''}`
 
-      const res = await fetch('https://llm.blackbox.ai/chat/completions', {
-        method: 'POST',
-        headers: {
-          'customerId': 'cus_U5TPiaMB3pYGNU',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer xxx',
-        },
-        body: JSON.stringify({
-          model: 'openrouter/claude-sonnet-4',
-          messages: [
-            { role: 'system', content: 'Você é um designer especialista em cake toppers. Responda sempre em JSON válido.' },
-            { role: 'user', content: prompt },
-          ],
-        }),
-      })
+      const materialLabel = getMaterialLabel(form.material)
+      const noteText = form.notes?.trim() || 'sem notas adicionais'
 
-      if (res.ok) {
-        const data = await res.json()
-        const content = data.choices?.[0]?.message?.content ?? ''
-        try {
-          const jsonMatch = content.match(/\{[\s\S]*\}/)
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0])
-            const variantDescriptions = (parsed.variants ?? []).map((v: {name: string; style: string; colors: string; typography: string; details: string; estimatedPrice: string | number}) =>
-              `${v.name}: ${v.style}. Cores: ${v.colors}. Tipografia: ${v.typography}. ${v.details} (~${v.estimatedPrice}€)`
-            )
-            setAiVariants(variantDescriptions.slice(0, 3))
-          } else {
-            throw new Error('no json')
-          }
-        } catch {
-          setAiVariants([
-            'Variante Clássica Elegante: Letras cursivas douradas em acrílico transparente. Bordas finas com detalhes florais gravados. (~28€)',
-            'Variante Moderna Minimalista: Tipografia sans-serif em acrílico espelhado. Design limpo sem ornamentos. (~24€)',
-            'Variante Boho Natural: Madeira cortada a laser com textura orgânica. Flores silvestres gravadas. (~32€)',
-          ])
-        }
-      } else {
-        throw new Error('API error')
-      }
+      const variants = [
+        `Variante Clássica Elegante: composição equilibrada, tipografia delicada e acabamento sofisticado em ${materialLabel}. Ideal para um visual intemporal. Medidas previstas: ${measureText}.`,
+        `Variante Moderna Minimalista: design limpo, elegante e focado no nome e nos detalhes personalizados. Excelente para um topo moderno em ${materialLabel}. Medidas previstas: ${measureText}.`,
+        `Variante Decorativa Personalizada: proposta com mais elementos visuais e acabamento criativo, pensada com base nas notas do cliente (${noteText}). Desenvolvida em ${materialLabel}.`,
+      ]
+
+      await new Promise((r) => setTimeout(r, 900))
+      setAiVariants(variants)
     } catch {
       setAiVariants([
-        'Variante Clássica Elegante: Letras cursivas douradas em acrílico transparente. Bordas finas com detalhes florais gravados. (~28€)',
-        'Variante Moderna Minimalista: Tipografia sans-serif em acrílico espelhado. Design limpo sem ornamentos. (~24€)',
-        'Variante Boho Natural: Madeira cortada a laser com textura orgânica. Flores silvestres gravadas. (~32€)',
+        'Variante Clássica Elegante: composição equilibrada, tipografia delicada e acabamento sofisticado.',
+        'Variante Moderna Minimalista: design limpo, elegante e com foco no nome e nos detalhes personalizados.',
+        'Variante Decorativa Personalizada: opção criativa com mais elementos visuais e acabamento premium.',
       ])
     } finally {
       setGenerating(false)
@@ -124,32 +98,31 @@ Responde em JSON com array "variants" com campos: id, name, style, colors, typog
     }
   }
 
-  const buildWhatsAppMessage = (seller: boolean) => {
-    const base = seller
-      ? `📩 Novo pedido PERSONALIZADO — Pedido ${orderId}
+  const buildWhatsAppMessage = () => {
+    const selectedVariantText =
+      selectedVariant !== null ? `Variante ${selectedVariant + 1}` : 'Ainda sem variante selecionada'
+
+    const base = `Olá! Gostaria de pedir um orçamento para um topo personalizado.
+
+Pedido: ${orderId}
 Cliente: ${form.name}
-Tel: ${form.phone}
-Email: ${form.email}
-Produto: Topo de bolo personalizado
-Medidas: ${form.diameter ? `Ø ${form.diameter}cm` : `${form.height}×${form.width}cm`}${form.depth ? ` / Prof. ${form.depth}cm` : ''}
-Quantidade: ${form.quantity}
-Preço indicado: ${form.suggestedPrice ? `${form.suggestedPrice}€` : 'A consultar'}
-Material: ${form.material.charAt(0).toUpperCase() + form.material.slice(1)}
-Variante escolhida: ${selectedVariant !== null ? `#${selectedVariant + 1}` : 'Não selecionada'}
-Notas: ${form.notes || 'Sem notas'}
-Vista prévia: ${window.location.origin}/admin/pedidos/${orderId}`
-      : `✅ Pedido recebido! — Pedido ${orderId}
+WhatsApp do cliente: ${form.phone}
+Email: ${form.email || 'Não indicado'}
 
-Olá ${form.name}! A tua solicitação de design personalizado foi recebida com sucesso.
+Medidas:
+- Altura: ${form.height || 'Não indicado'} cm
+- Largura: ${form.width || 'Não indicado'} cm
+- Profundidade: ${form.depth || 'Não indicado'} cm
+- Diâmetro: ${form.diameter || 'Não indicado'} cm
 
-Vamos analisar os teus requisitos e entrar em contacto em menos de 2h com mockups e orçamento final.
+Quantidade: ${form.quantity || '1'}
+Tipo de papel: ${getMaterialLabel(form.material)}
+Variante escolhida: ${selectedVariantText}
+Notas: ${form.notes || 'Sem notas adicionais'}
 
-Resumo:
-• Material: ${form.material}
-• Medidas: ${form.diameter ? `Ø ${form.diameter}cm` : `${form.height}×${form.width}cm`}
-• Quantidade: ${form.quantity}
-
-Obrigado por escolheres Topo & Bolo! 🎂`
+Preço: orçamento final enviado pela loja via WhatsApp.
+Valores desde 7,99€.
+`
 
     return encodeURIComponent(base)
   }
@@ -157,14 +130,14 @@ Obrigado por escolheres Topo & Bolo! 🎂`
   const handleSubmit = async () => {
     if (!form.gdprConsent) return
     setSubmitting(true)
-    await new Promise((r) => setTimeout(r, 1200))
+    await new Promise((r) => setTimeout(r, 900))
     setSubmitting(false)
     setStep('success')
   }
 
   const steps: Step[] = ['upload', 'details', 'contact', 'preview', 'success']
   const stepIdx = steps.indexOf(step)
-  const progress = ((stepIdx) / (steps.length - 1)) * 100
+  const progress = (stepIdx / (steps.length - 1)) * 100
 
   const stepLabels = ['Imagem', 'Detalhes', 'Contacto', 'Variantes', 'Confirmação']
 
@@ -175,7 +148,6 @@ Obrigado por escolheres Topo & Bolo! 🎂`
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="relative bg-[var(--cream)] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-fade-in-up">
-        {/* Header */}
         <div className="bg-[var(--charcoal)] text-[var(--cream)] px-6 py-5 flex items-center justify-between shrink-0">
           <div>
             <h2
@@ -185,7 +157,7 @@ Obrigado por escolheres Topo & Bolo! 🎂`
               Design Personalizado
             </h2>
             <p className="text-xs text-[var(--cream)]/60 font-[var(--font-body)] mt-0.5">
-              Gerado por IA — 3 variantes grátis
+              Sugestões automáticas • orçamento final via WhatsApp
             </p>
           </div>
           <button onClick={onClose} className="text-[var(--cream)]/60 hover:text-[var(--cream)] transition-colors">
@@ -193,7 +165,6 @@ Obrigado por escolheres Topo & Bolo! 🎂`
           </button>
         </div>
 
-        {/* Progress */}
         {step !== 'success' && (
           <div className="shrink-0 px-6 py-3 border-b border-[var(--border)] bg-[var(--cream)]">
             <div className="flex justify-between mb-1.5">
@@ -218,10 +189,7 @@ Obrigado por escolheres Topo & Bolo! 🎂`
           </div>
         )}
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
-
-          {/* STEP 1 — Upload */}
           {step === 'upload' && (
             <div className="space-y-6">
               <div>
@@ -229,7 +197,7 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                   Mostra-nos a tua inspiração
                 </h3>
                 <p className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
-                  Carrega uma imagem de referência (jpg, png, pdf). A nossa IA gerará 3 variantes de design.
+                  Carrega uma imagem de referência (jpg, png, pdf). Com base nela, geramos sugestões para o teu topo.
                 </p>
               </div>
 
@@ -238,7 +206,10 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                   'border-2 border-dashed rounded-none p-10 text-center cursor-pointer transition-colors',
                   dragOver ? 'border-[var(--gold)] bg-[var(--gold-light)]' : 'border-[var(--border)] hover:border-[var(--charcoal)]'
                 )}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setDragOver(true)
+                }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
                 onClick={() => fileRef.current?.click()}
@@ -290,7 +261,6 @@ Obrigado por escolheres Topo & Bolo! 🎂`
             </div>
           )}
 
-          {/* STEP 2 — Details */}
           {step === 'details' && (
             <div className="space-y-6">
               <div>
@@ -298,11 +268,10 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                   Especificações do topo
                 </h3>
                 <p className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
-                  Preenche as medidas e preferências de material.
+                  Preenche as medidas e preferências do teu pedido.
                 </p>
               </div>
 
-              {/* Measures */}
               <div>
                 <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] mb-3 font-[var(--font-body)]">
                   Medidas (cm)
@@ -329,8 +298,7 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                 </div>
               </div>
 
-              {/* Quantity & Price */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3">
                 <div>
                   <label className="block text-xs text-[var(--charcoal-light)] mb-1 font-[var(--font-body)]">Quantidade *</label>
                   <input
@@ -341,22 +309,14 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                     className="w-full border border-[var(--border)] bg-transparent px-3 py-2.5 text-sm text-[var(--charcoal)] outline-none focus:border-[var(--charcoal)] transition-colors font-[var(--font-body)]"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs text-[var(--charcoal-light)] mb-1 font-[var(--font-body)]">Preço sugerido (€)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.suggestedPrice}
-                    onChange={(e) => setForm({ ...form, suggestedPrice: e.target.value })}
-                    className="w-full border border-[var(--border)] bg-transparent px-3 py-2.5 text-sm text-[var(--charcoal)] outline-none focus:border-[var(--charcoal)] transition-colors font-[var(--font-body)]"
-                    placeholder="Orçamento desejado"
-                  />
-                </div>
+
+                <p className="text-xs text-[var(--charcoal-light)] font-[var(--font-body)]">
+                  Valores desde 7,99€. O orçamento final será enviado via WhatsApp conforme a personalização, tipo de papel e nível de detalhe.
+                </p>
               </div>
 
-              {/* Material */}
               <div>
-                <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] mb-3 font-[var(--font-body)]">Material *</p>
+                <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] mb-3 font-[var(--font-body)]">Tipo de papel *</p>
                 <div className="grid grid-cols-2 gap-2">
                   {MATERIALS.map((m) => (
                     <button
@@ -370,7 +330,12 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                       )}
                     >
                       <p className="text-sm font-semibold font-[var(--font-body)]">{m.label}</p>
-                      <p className={cn('text-xs mt-0.5 font-[var(--font-body)]', form.material === m.value ? 'text-[var(--cream)]/70' : 'text-[var(--charcoal-light)]')}>
+                      <p
+                        className={cn(
+                          'text-xs mt-0.5 font-[var(--font-body)]',
+                          form.material === m.value ? 'text-[var(--cream)]/70' : 'text-[var(--charcoal-light)]'
+                        )}
+                      >
                         {m.desc}
                       </p>
                     </button>
@@ -378,7 +343,6 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                 </div>
               </div>
 
-              {/* Notes */}
               <div>
                 <label className="block text-xs tracking-widest uppercase text-[var(--charcoal-light)] mb-2 font-[var(--font-body)]">
                   Notas adicionais
@@ -387,7 +351,7 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                   rows={3}
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  placeholder="Ex: cores pastéis, fonte cursiva, animais, datas específicas…"
+                  placeholder="Ex: cores pastéis, fonte cursiva, tema específico, data, nome..."
                   className="w-full border border-[var(--border)] bg-transparent px-3 py-2.5 text-sm text-[var(--charcoal)] outline-none focus:border-[var(--charcoal)] transition-colors resize-none font-[var(--font-body)] placeholder:text-[var(--charcoal-light)]/50"
                 />
               </div>
@@ -415,7 +379,6 @@ Obrigado por escolheres Topo & Bolo! 🎂`
             </div>
           )}
 
-          {/* STEP 3 — Contact */}
           {step === 'contact' && (
             <div className="space-y-6">
               <div>
@@ -423,7 +386,7 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                   Os teus dados
                 </h3>
                 <p className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
-                  Para enviarmos os mockups e orçamento por WhatsApp.
+                  Para enviarmos o pedido e o orçamento final via WhatsApp.
                 </p>
               </div>
 
@@ -447,12 +410,12 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                 ))}
               </div>
 
-              {/* Consents */}
               <div className="space-y-3 p-4 bg-[var(--cream-dark)] border border-[var(--border)]">
-                <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] font-[var(--font-body)]">Consentimentos (GDPR)</p>
+                <p className="text-xs tracking-widest uppercase text-[var(--charcoal-light)] font-[var(--font-body)]">Consentimentos</p>
+
                 {[
                   { key: 'gdprConsent', label: 'Autorizo o tratamento dos meus dados pessoais para processamento do pedido (obrigatório) *' },
-                  { key: 'whatsappConsent', label: 'Autorizo o contacto por WhatsApp para envio de mockups, orçamentos e confirmações de encomenda' },
+                  { key: 'whatsappConsent', label: 'Autorizo o contacto por WhatsApp para envio de orçamento e confirmação da encomenda' },
                 ].map(({ key, label }) => (
                   <label key={key} className="flex items-start gap-3 cursor-pointer">
                     <input
@@ -486,12 +449,12 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                   {generating ? (
                     <>
                       <Loader2 size={14} className="animate-spin" />
-                      A gerar variantes IA…
+                      A gerar sugestões…
                     </>
                   ) : (
                     <>
                       <Sparkles size={14} />
-                      Gerar 3 Variantes IA
+                      Ver Sugestões
                     </>
                   )}
                 </button>
@@ -499,15 +462,14 @@ Obrigado por escolheres Topo & Bolo! 🎂`
             </div>
           )}
 
-          {/* STEP 4 — Preview/Variants */}
           {step === 'preview' && (
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-medium mb-1" style={{ fontFamily: 'var(--font-display)' }}>
-                  As tuas 3 variantes IA
+                  Sugestões para o teu topo
                 </h3>
                 <p className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
-                  Escolhe a variante que preferes (ou escolhe todas para orçamento completo).
+                  Escolhe a opção que preferes para enviar junto com o pedido.
                 </p>
               </div>
 
@@ -524,14 +486,19 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={cn(
-                        'w-6 h-6 border-2 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors',
-                        selectedVariant === i ? 'border-[var(--gold)] bg-[var(--gold)]' : 'border-[var(--border)]'
-                      )}>
+                      <div
+                        className={cn(
+                          'w-6 h-6 border-2 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors',
+                          selectedVariant === i ? 'border-[var(--gold)] bg-[var(--gold)]' : 'border-[var(--border)]'
+                        )}
+                      >
                         {selectedVariant === i && <div className="w-2 h-2 bg-[var(--charcoal)] rounded-full" />}
                       </div>
                       <div>
-                        <p className="text-xs tracking-widest uppercase mb-1 font-[var(--font-body)]" style={{ color: selectedVariant === i ? 'var(--gold)' : 'var(--charcoal-light)' }}>
+                        <p
+                          className="text-xs tracking-widest uppercase mb-1 font-[var(--font-body)]"
+                          style={{ color: selectedVariant === i ? 'var(--gold)' : 'var(--charcoal-light)' }}
+                        >
                           Variante {i + 1}
                         </p>
                         <p className={cn('text-sm leading-relaxed font-[var(--font-body)]', selectedVariant === i ? 'text-[var(--cream)]' : 'text-[var(--charcoal)]')}>
@@ -546,7 +513,7 @@ Obrigado por escolheres Topo & Bolo! 🎂`
               <div className="p-4 bg-[var(--gold-light)] border border-[var(--gold)]/30 flex gap-3">
                 <AlertCircle size={16} className="text-[var(--gold)] shrink-0 mt-0.5" />
                 <p className="text-xs text-[var(--charcoal)] font-[var(--font-body)] leading-relaxed">
-                  Após submissão, receberás mockups visuais reais no teu WhatsApp em menos de 2h, com orçamento final.
+                  O orçamento final será enviado diretamente pela loja via WhatsApp, conforme o nível de detalhe, tipo de papel e personalização do trabalho.
                 </p>
               </div>
 
@@ -565,17 +532,16 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                   {submitting ? (
                     <>
                       <Loader2 size={14} className="animate-spin" />
-                      A enviar…
+                      A preparar pedido…
                     </>
                   ) : (
-                    'Submeter Pedido'
+                    'Enviar para WhatsApp'
                   )}
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 5 — Success */}
           {step === 'success' && (
             <div className="text-center py-8 space-y-6">
               <div className="flex justify-center">
@@ -586,10 +552,10 @@ Obrigado por escolheres Topo & Bolo! 🎂`
 
               <div>
                 <h3 className="text-2xl font-semibold mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-                  Pedido Recebido!
+                  Pedido Preparado!
                 </h3>
                 <p className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
-                  Pedido <strong className="text-[var(--charcoal)]">{orderId}</strong> submetido com sucesso.
+                  Pedido <strong className="text-[var(--charcoal)]">{orderId}</strong> pronto para envio por WhatsApp.
                 </p>
               </div>
 
@@ -598,31 +564,31 @@ Obrigado por escolheres Topo & Bolo! 🎂`
                 {[
                   ['Pedido', orderId],
                   ['Cliente', form.name],
-                  ['Material', form.material],
+                  ['Tipo de papel', getMaterialLabel(form.material)],
                   ['Medidas', form.diameter ? `Ø ${form.diameter}cm` : `${form.height}×${form.width}cm`],
                   ['Quantidade', form.quantity],
-                  ['Variante', selectedVariant !== null ? `#${selectedVariant + 1}` : 'Todas'],
+                  ['Variante', selectedVariant !== null ? `#${selectedVariant + 1}` : 'Sem variante definida'],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between text-sm font-[var(--font-body)]">
                     <span className="text-[var(--charcoal-light)]">{k}</span>
-                    <span className="text-[var(--charcoal)] font-medium">{v}</span>
+                    <span className="text-[var(--charcoal)] font-medium text-right">{v}</span>
                   </div>
                 ))}
               </div>
 
               <div className="space-y-3">
                 <p className="text-sm text-[var(--charcoal-light)] font-[var(--font-body)]">
-                  Receberás uma mensagem de confirmação no teu WhatsApp em breve. Em menos de 2h enviamos mockups e orçamento final.
+                  O valor final será confirmado pela loja via WhatsApp. Valores desde 7,99€.
                 </p>
 
                 <a
-                  href={`https://wa.me/${form.phone.replace(/\D/g, '')}?text=${buildWhatsAppMessage(false)}`}
+                  href={`https://wa.me/${SELLER_WHATSAPP}?text=${buildWhatsAppMessage()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 bg-[var(--whatsapp)] text-[var(--whatsapp-fg)] py-3.5 text-sm font-bold tracking-widest uppercase font-[var(--font-body)] hover:opacity-90 transition-opacity"
                 >
                   <MessageCircle size={15} />
-                  Ver confirmação no WhatsApp
+                  Pedir orçamento no WhatsApp
                 </a>
 
                 <button

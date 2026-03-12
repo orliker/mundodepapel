@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { AIChatWidget } from "@/components/ai-chat-widget"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const WA_NUMBER = "351910000000"
+const WA_NUMBER = "351965716782"
 const WA_BASE = `https://wa.me/${WA_NUMBER}`
 const waLink = (text: string) => `${WA_BASE}?text=${encodeURIComponent(text)}`
 
