@@ -1554,6 +1554,37 @@ export default function Page() {
           .cat-grid    { grid-template-columns: 1fr !important; }
           .gallery-grid { grid-template-columns: 1fr !important; }
         }
+        .hero-visual-wrap {
+  overflow: visible;
+}
+
+@media (max-width: 768px) {
+  .hero-visual-wrap {
+    width: 100% !important;
+    max-width: 420px !important;
+    padding-top: 16px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-bottom: 110px !important;
+    margin: 0 auto !important;
+  }
+
+  .hero-badge-right {
+    top: 10px !important;
+    right: 10px !important;
+    min-width: 104px !important;
+    padding: 10px 14px !important;
+  }
+
+  .hero-badge-left {
+    left: 50% !important;
+    bottom: 0 !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 28px) !important;
+    max-width: 320px !important;
+    text-align: center !important;
+  }
+}
         button:focus-visible, a:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
         .hover-lift { transition: transform 0.22s ease, box-shadow 0.22s ease !important; }
         .hover-lift:hover { transform: translateY(-4px) !important; box-shadow: 0 16px 40px rgba(59,130,246,0.18) !important; }
@@ -1659,25 +1690,94 @@ export default function Page() {
 
           {/* Hero visual */}
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div style={{ position: "relative", width: "min(380px, 100%)" }}>
-              <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 24px 64px rgba(30,58,95,0.22)", border: "4px solid rgba(255,255,255,0.9)" }}>
-               <img
-  src="/images/hero/hero-topos.jpg"
-  alt="Colagem de topos de bolo artesanais personalizados feitos em Portugal com cores azul e branco"
-  style={{ width: "100%", display: "block" }}
-/>              </div>
-              {/* Floating card */}
-              <div style={{ position: "absolute", bottom: -18, left: -22, background: "#fff", borderRadius: 18, padding: "14px 18px", boxShadow: "0 12px 36px rgba(30,58,95,0.18)", border: "1.5px solid #bfdbfe" }}>
-                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Pronto em</div>
-                <div style={{ fontWeight: 800, color: "#1e3a5f", fontSize: 18, fontFamily: "'Playfair Display',Georgia,serif" }}>3-5 dias</div>
-                <div style={{ fontSize: 12, color: "#3b82f6", fontWeight: 600 }}>Envio para todo Portugal</div>
-              </div>
-              <div style={{ position: "absolute", top: -16, right: -16, background: "linear-gradient(135deg,#3b82f6,#1e3a5f)", borderRadius: 18, padding: "12px 16px", boxShadow: "0 10px 30px rgba(59,130,246,0.35)", color: "#fff", textAlign: "center" }}>
-                <div style={{ fontSize: 22, fontWeight: 800 }}>7,90€</div>
-                <div style={{ fontSize: 10, fontWeight: 700, opacity: 0.9 }}>A PARTIR DE</div>
-              </div>
-            </div>
-          </div>
+  <div
+    className="hero-visual-wrap"
+    style={{
+      position: "relative",
+      width: "min(460px, 100%)",
+      paddingBottom: 80,
+      paddingTop: 28,
+      paddingLeft: 28,
+      paddingRight: 28,
+    }}
+  >
+    <div
+      style={{
+        borderRadius: 28,
+        overflow: "hidden",
+        boxShadow: "0 24px 64px rgba(30,58,95,0.22)",
+        border: "4px solid rgba(255,255,255,0.9)",
+        background: "#fff",
+      }}
+    >
+      <img
+        src="/images/hero/hero-topos.jpg"
+        alt="Colagem de topos de bolo artesanais personalizados feitos em Portugal com cores azul e branco"
+        style={{ width: "100%", display: "block" }}
+      />
+    </div>
+
+    <div
+      className="hero-badge-left"
+      style={{
+        position: "absolute",
+        left: 0,
+        bottom: 0,
+        background: "#fff",
+        borderRadius: 18,
+        padding: "14px 18px",
+        boxShadow: "0 12px 36px rgba(30,58,95,0.18)",
+        border: "1.5px solid #bfdbfe",
+        maxWidth: 220,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          color: "#64748b",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+        }}
+      >
+        Pronto em
+      </div>
+      <div
+        style={{
+          fontWeight: 800,
+          color: "#1e3a5f",
+          fontSize: 18,
+          fontFamily: "'Playfair Display',Georgia,serif",
+        }}
+      >
+        3-5 dias
+      </div>
+      <div style={{ fontSize: 12, color: "#3b82f6", fontWeight: 600 }}>
+        Envio para todo Portugal
+      </div>
+    </div>
+
+    <div
+      className="hero-badge-right"
+      style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        background: "linear-gradient(135deg,#3b82f6,#1e3a5f)",
+        borderRadius: 18,
+        padding: "12px 16px",
+        boxShadow: "0 10px 30px rgba(59,130,246,0.35)",
+        color: "#fff",
+        textAlign: "center",
+        minWidth: 118,
+      }}
+    >
+      <div style={{ fontSize: 22, fontWeight: 800 }}>7,90€</div>
+      <div style={{ fontSize: 10, fontWeight: 700, opacity: 0.9 }}>A PARTIR DE</div>
+    </div>
+  </div>
+</div>
+  
         </div>
       </section>
 
@@ -1760,122 +1860,122 @@ export default function Page() {
           <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20 }}>
             {CATEGORIES.map((cat) => (
   <div
-    key={cat.id}
-    className="cat-card"
-    onClick={() => {
-      setSelectedCategory(cat)
-      setDetailsOpen(true)
-    }}
-    style={{
-      background: "#fff",
-      borderRadius: 24,
-      border: "1.5px solid #dbeafe",
-      overflow: "hidden",
-      boxShadow: "0 8px 32px rgba(30,58,95,0.08)",
-      transition: "all 0.25s ease",
-      cursor: "pointer",
-    }}
-  >
-    <div style={{ position: "relative" }}>
-      <img
-        src={cat.image}
-        alt={cat.name}
-        style={{ width: "100%", height: 190, objectFit: "cover", display: "block" }}
-      />
+  key={cat.id}
+  className="cat-card"
+  onClick={() => {
+    setSelectedCategory(cat)
+    setDetailsOpen(true)
+  }}
+  style={{
+    background: "#fff",
+    borderRadius: 24,
+    border: "1.5px solid #dbeafe",
+    overflow: "hidden",
+    boxShadow: "0 8px 32px rgba(30,58,95,0.08)",
+    transition: "all 0.25s ease",
+    cursor: "pointer",
+  }}
+>
+  <div style={{ position: "relative" }}>
+    <img
+      src={cat.image}
+      alt={cat.name}
+      style={{ width: "100%", height: 190, objectFit: "cover", display: "block" }}
+    />
 
+    <div
+      style={{
+        position: "absolute",
+        top: 12,
+        left: 12,
+        background: "rgba(255,255,255,0.95)",
+        color: "#3b82f6",
+        borderRadius: 100,
+        padding: "6px 12px",
+        fontSize: 12,
+        fontWeight: 800,
+      }}
+    >
+      Desde {cat.price}€
+    </div>
+
+    {cat.badge && (
       <div
         style={{
           position: "absolute",
           top: 12,
-          left: 12,
-          background: "rgba(255,255,255,0.95)",
-          color: "#3b82f6",
+          right: 12,
+          background: "#3b82f6",
+          color: "#fff",
           borderRadius: 100,
           padding: "6px 12px",
           fontSize: 12,
           fontWeight: 800,
         }}
       >
-        Desde {cat.price}€
+        {cat.badge}
       </div>
+    )}
+  </div>
 
-      {cat.badge && (
-        <div
-          style={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            background: "#3b82f6",
-            color: "#fff",
-            borderRadius: 100,
-            padding: "6px 12px",
-            fontSize: 12,
-            fontWeight: 800,
-          }}
-        >
-          {cat.badge}
-        </div>
-      )}
-    </div>
+  <div style={{ padding: 22 }}>
+    <h3
+      style={{
+        fontFamily: "'Playfair Display',Georgia,serif",
+        fontSize: 20,
+        color: "#1e3a5f",
+        marginBottom: 8,
+      }}
+    >
+      {cat.emoji} {cat.name}
+    </h3>
 
-    <div style={{ padding: 22 }}>
-      <h3
+    <p style={{ color: "#64748b", fontSize: 15, lineHeight: 1.6, minHeight: 74 }}>
+      {cat.desc}
+    </p>
+
+    <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          handleCustomizeFromCategory(cat)
+        }}
         style={{
-          fontFamily: "'Playfair Display',Georgia,serif",
-          fontSize: 20,
-          color: "#1e3a5f",
-          marginBottom: 8,
+          padding: "13px 18px",
+          borderRadius: 14,
+          border: "none",
+          background: "#3b82f6",
+          color: "#fff",
+          fontWeight: 800,
+          fontSize: 15,
+          cursor: "pointer",
         }}
       >
-        {cat.emoji} {cat.name}
-      </h3>
+        Personalizar este modelo
+      </button>
 
-      <p style={{ color: "#64748b", fontSize: 15, lineHeight: 1.6, minHeight: 74 }}>
-        {cat.desc}
-      </p>
-
-      <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            handleCustomizeFromCategory(cat)
-          }}
-          style={{
-            padding: "13px 18px",
-            borderRadius: 14,
-            border: "none",
-            background: "#3b82f6",
-            color: "#fff",
-            fontWeight: 800,
-            fontSize: 15,
-            cursor: "pointer",
-          }}
-        >
-          Personalizar este modelo
-        </button>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            setSelectedCategory(cat)
-            setDetailsOpen(true)
-          }}
-          style={{
-            padding: "13px 18px",
-            borderRadius: 14,
-            border: "2px solid #bfdbfe",
-            background: "#fff",
-            color: "#3b82f6",
-            fontWeight: 800,
-            fontSize: 15,
-            cursor: "pointer",
-          }}
-        >
-          Ver detalhes
-        </button>
-      </div>
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          setSelectedCategory(cat)
+          setDetailsOpen(true)
+        }}
+        style={{
+          padding: "13px 18px",
+          borderRadius: 14,
+          border: "2px solid #bfdbfe",
+          background: "#fff",
+          color: "#3b82f6",
+          fontWeight: 800,
+          fontSize: 15,
+          cursor: "pointer",
+        }}
+      >
+        Ver detalhes
+      </button>
     </div>
   </div>
+</div>
 ))}
           </div>
           <Reveal delay={200}>
@@ -2175,9 +2275,15 @@ export default function Page() {
 
       {/* ── CART PANEL ───────────────────────────────────────────────────────────────────── */}
       {cartOpen && <CartPanel items={cartItems} onRemove={removeFromCart} onClose={() => setCartOpen(false)} />}
-
+<CategoryDetailsDrawer
+  item={selectedCategory}
+  open={detailsOpen}
+  onClose={() => setDetailsOpen(false)}
+  onCustomize={handleCustomizeFromCategory}
+/>
       {/* ── AI CHAT WIDGET ───────────────────────────────────────────────────────────────── */}
       <AIChatWidget/>
+      
     </div>
   )
 }
