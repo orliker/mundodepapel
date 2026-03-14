@@ -1598,7 +1598,7 @@ useEffect(() => {
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
     padding: 0,
   }}
 >
@@ -1606,8 +1606,8 @@ useEffect(() => {
     src="/logo-mundo-de-papel.png"
     alt="Mundo de Papel Portugal"
     style={{
-      width: 44,
-      height: 44,
+      width: 55,
+      height: 55,
       borderRadius: "50%",
       objectFit: "cover",
       flexShrink: 0,
