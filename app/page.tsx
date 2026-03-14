@@ -1505,10 +1505,11 @@ function CartPanel({ items, onRemove, onClose }: { items: CartItem[]; onRemove: 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState<ProductReference | null>(null)
-  const [detailsOpen, setDetailsOpen] = useState(false)
-  const [configReference, setConfigReference] = useState<ProductReference | null>(null)
-  const [heroImageIndex, setHeroImageIndex] = useState(0)
-  const [menuOpen, setMenuOpen] = useState(false)
+const [detailsOpen, setDetailsOpen] = useState(false)
+const [configReference, setConfigReference] = useState<ProductReference | null>(null)
+const [heroImageIndex, setHeroImageIndex] = useState(0)
+const [heroVisible, setHeroVisible] = useState(true)
+const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
   const [cartOpen, setCartOpen] = useState(false)
@@ -1526,12 +1527,16 @@ export default function Page() {
 
 useEffect(() => {
   const interval = setInterval(() => {
-    setHeroImageIndex((prev) => (prev + 1) % HERO_IMAGES.length)
+    setHeroVisible(false)
+
+    setTimeout(() => {
+      setHeroImageIndex((prev) => (prev + 1) % HERO_IMAGES.length)
+      setHeroVisible(true)
+    }, 250)
   }, 5000)
 
   return () => clearInterval(interval)
 }, [])
-
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 50)
@@ -1746,20 +1751,28 @@ useEffect(() => {
     }}
   >
     <div
-      style={{
-        borderRadius: 28,
-        overflow: "hidden",
-        boxShadow: "0 24px 64px rgba(30,58,95,0.22)",
-        border: "4px solid rgba(255,255,255,0.9)",
-        background: "#fff",
-      }}
-    >
-      <img
-        src="/images/hero/hero-topos.jpg"
-        alt="Colagem de topos de bolo artesanais personalizados feitos em Portugal com cores azul e branco"
-        style={{ width: "100%", display: "block" }}
-      />
-    </div>
+  style={{
+    borderRadius: 28,
+    overflow: "hidden",
+    boxShadow: "0 24px 64px rgba(30,58,95,0.22)",
+    border: "4px solid rgba(255,255,255,0.9)",
+    background: "#fff",
+  }}
+>
+  <img
+    src={HERO_IMAGES[heroImageIndex]}
+    alt="Topos de bolo artesanais personalizados feitos em Portugal"
+    style={{
+      width: "100%",
+      height: 420,
+      objectFit: "cover",
+      objectPosition: "center",
+      display: "block",
+      opacity: heroVisible ? 1 : 0,
+      transition: "opacity 0.5s ease",
+    }}
+  />
+</div>
 
     <div
       className="hero-badge-left"
