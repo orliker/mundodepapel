@@ -257,7 +257,7 @@ export function AIChatWidget() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "init",
     role: "assistant",
-    content: "Olá! Sou a Papi, a tua assistente da Mundo de Papel Portugal! ✨\n\nVou ajudar-te a criar o topo de bolo dos teus sonhos.\n\nPrimeiro, podes partilhar uma imagem de inspiração? (opcional) Ou diz-me logo qual é o tipo de evento!",
+    content: "Olá! Sou o Robertinho, a tua assistente da Mundo de Papel Portugal! ✨\n\nVou ajudar-te a criar o topo de bolo dos teus sonhos.\n\nPrimeiro, podes partilhar uma imagem de inspiração? (opcional) Ou diz-me logo qual é o tipo de evento!",
   }])
 
   const endRef = useRef<HTMLDivElement>(null)
@@ -489,7 +489,7 @@ export function AIChatWidget() {
           <button
             className={`chat-fab${showPulse && !open ? " pulse" : ""}`}
             onClick={() => setOpen((o) => !o)}
-            aria-label={open ? "Fechar assistente" : "Falar com a Papi"}
+            aria-label={open ? "Fechar assistente" : "Falar com o Robertinho"}
             style={{
               width: 56,
               height: 56,
@@ -582,7 +582,7 @@ export function AIChatWidget() {
 
       {/* ── Chat Panel ────────────────────────────────────────────────────── */}
       {open && (
-        <div style={panelStyle} role="dialog" aria-label="Assistente Papi — Mundo de Papel Portugal">
+        <div style={panelStyle} role="dialog" aria-label="Assistente Robertinho — Mundo de Papel Portugal">
 
           {/* Header */}
           <div style={{
@@ -610,7 +610,7 @@ export function AIChatWidget() {
             </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: "#fff", fontWeight: 700, fontSize: 14.5, lineHeight: 1.2 }}>Papi</div>
+              <div style={{ color: "#fff", fontWeight: 700, fontSize: 14.5, lineHeight: 1.2 }}>Robertinho</div>
               <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 11.5, marginTop: 2 }}>
                 Assistente Mundo de Papel · Online
               </div>

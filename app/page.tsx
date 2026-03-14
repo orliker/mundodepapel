@@ -163,6 +163,14 @@ const CATEGORIES: ProductReference[] = [
   },
 ]
 
+const HERO_IMAGES = [
+  "/images/categorias/aniversario.png",
+  "/images/categorias/halloween.png",
+  "/images/categorias/batizado.png",
+  "/images/categorias/casamento.png",
+  "/images/categorias/cha-de-bebe.png",
+]
+
 const GALLERY = [
   {
     id: "g1",
@@ -573,17 +581,19 @@ Regras:
         style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(2px)" }}
       />
       <div
-        style={{
-          position: "relative",
-          width: "100%",
-          maxWidth: 520,
-          height: "100vh",
-          background: "#fff",
-          overflowY: "auto",
-          boxShadow: "-12px 0 40px rgba(0,0,0,0.18)",
-          padding: 24,
-        }}
-      >
+  style={{
+    position: "relative",
+    width: "100%",
+    maxWidth: 520,
+    height: "100vh",
+    background: "#fff",
+    overflowY: "auto",
+    boxShadow: "-12px 0 40px rgba(0,0,0,0.18)",
+    padding: 24,
+    transform: "translateX(0)",
+    animation: "drawerSlideIn 0.28s ease",
+  }}
+>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#3b82f6", textTransform: "uppercase", letterSpacing: "0.08em" }}>
@@ -602,13 +612,28 @@ Regras:
           </button>
         </div>
 
-        <div style={{ borderRadius: 20, overflow: "hidden", border: "1.5px solid #dbeafe", marginBottom: 18 }}>
-          <img
-            src={item.image}
-            alt={item.name}
-            style={{ width: "100%", height: 260, objectFit: "cover", display: "block" }}
-          />
-        </div>
+        <div
+  style={{
+    borderRadius: 20,
+    overflow: "hidden",
+    border: "1.5px solid #dbeafe",
+    marginBottom: 18,
+    background: "#f8fbff",
+  }}
+>
+  <img
+    src={item.image}
+    alt={item.name}
+    style={{
+      width: "100%",
+      maxHeight: "70vh",
+      objectFit: "contain",
+      objectPosition: "center",
+      display: "block",
+      background: "#f8fbff",
+    }}
+  />
+</div>
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
           <span
@@ -1482,6 +1507,7 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState<ProductReference | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [configReference, setConfigReference] = useState<ProductReference | null>(null)
+  const [heroImageIndex, setHeroImageIndex] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
@@ -1497,6 +1523,14 @@ export default function Page() {
   }
 
   const WA_BUSINESS = waLink("Olá, gostaria de receber a tabela de preços para empresas.")
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setHeroImageIndex((prev) => (prev + 1) % HERO_IMAGES.length)
+  }, 5000)
+
+  return () => clearInterval(interval)
+}, [])
 
   useEffect(() => {
     const onScroll = () => {
@@ -1593,6 +1627,16 @@ export default function Page() {
         .wa-btn:hover { filter: brightness(1.07); transform: translateY(-2px) !important; }
         .blue-btn:hover { background: #1d4ed8 !important; transform: translateY(-2px); }
         input:focus, textarea:focus, select:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        @keyframes drawerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
       `}</style>
 
       {/* ── NAVBAR ──────────────────────────────────────────────────────────────────────── */}
@@ -1867,21 +1911,28 @@ export default function Page() {
     setDetailsOpen(true)
   }}
   style={{
-    background: "#fff",
-    borderRadius: 24,
-    border: "1.5px solid #dbeafe",
-    overflow: "hidden",
-    boxShadow: "0 8px 32px rgba(30,58,95,0.08)",
-    transition: "all 0.25s ease",
-    cursor: "pointer",
-  }}
+  background: "#fff",
+  borderRadius: 24,
+  border: "1.5px solid #dbeafe",
+  overflow: "hidden",
+  boxShadow: "0 8px 32px rgba(30,58,95,0.08)",
+  transition: "transform 0.25s ease, box-shadow 0.25s ease",
+  cursor: "pointer",
+}}
 >
   <div style={{ position: "relative" }}>
     <img
-      src={cat.image}
-      alt={cat.name}
-      style={{ width: "100%", height: 190, objectFit: "cover", display: "block" }}
-    />
+  src={cat.image}
+  alt={cat.name}
+  style={{
+    width: "100%",
+    height: 220,
+    objectFit: "cover",
+    objectPosition: "center",
+    display: "block",
+    transition: "transform 0.35s ease",
+  }}
+/>
 
     <div
       style={{
