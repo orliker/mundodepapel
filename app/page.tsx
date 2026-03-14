@@ -1143,7 +1143,7 @@ function Configurator({
                     gap: 12,
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between", }}>
                     <img
                       src={m.image}
                       alt={m.label}
@@ -1154,11 +1154,7 @@ function Configurator({
                       <div style={{ fontSize: 12, color: "#64748b" }}>{m.desc}</div>
                     </div>
                   </div>
-                  {material === m.label && (
-                    <span style={{ color: "#3b82f6" }}>
-                      <CheckIcon />
-                    </span>
-                  )}
+                  
                 </button>
               ))}
             </div>
