@@ -683,62 +683,7 @@ Regras:
           </p>
         </div>
 
-        <div style={{ marginBottom: 22 }}>
-          <h3
-            style={{
-              fontSize: 14,
-              fontWeight: 800,
-              color: "#1e3a5f",
-              marginBottom: 10,
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-            }}
-          >
-            Materiais
-          </h3>
-
-          <div style={{ display: "grid", gap: 10 }}>
-            {item.materials.map((mat) => {
-              const materialData = MATERIALS.find((m) => m.label === mat)
-
-              return (
-                <div
-                  key={mat}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "12px 14px",
-                    border: "1.5px solid #dbeafe",
-                    borderRadius: 14,
-                    background: "#f8fbff",
-                  }}
-                >
-                  {materialData?.image && (
-                    <img
-                      src={materialData.image}
-                      alt={mat}
-                      style={{
-                        width: 52,
-                        height: 52,
-                        objectFit: "cover",
-                        borderRadius: 10,
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-
-                  <div>
-                    <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14 }}>{mat}</div>
-                    <div style={{ fontSize: 12, color: "#64748b" }}>
-                      {materialData?.desc || "Material premium disponível para personalização"}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+        
 
         <div style={{ display: "grid", gap: 12 }}>
           <button
@@ -1799,7 +1744,7 @@ useEffect(() => {
       opacity: heroVisible ? 1 : 0,
       transform: heroAnimating ? "scale(1.02)" : "scale(1)",
       filter: heroVisible ? "blur(0px)" : "blur(6px)",
-      transition: "opacity 0.9s ease, transform 1s ease, filter 0.9s ease",
+      transition: "opacity 0.9s ease, transform 1s ease, filter 0.s ease",
       position: "relative",
       zIndex: 1,
       padding: 16,
