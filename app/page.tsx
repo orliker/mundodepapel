@@ -1504,11 +1504,12 @@ function CartPanel({ items, onRemove, onClose }: { items: CartItem[]; onRemove: 
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Page() {
-  const [selectedCategory, setSelectedCategory] = useState<ProductReference | null>(null)
+const [selectedCategory, setSelectedCategory] = useState<ProductReference | null>(null)
 const [detailsOpen, setDetailsOpen] = useState(false)
 const [configReference, setConfigReference] = useState<ProductReference | null>(null)
 const [heroImageIndex, setHeroImageIndex] = useState(0)
 const [heroVisible, setHeroVisible] = useState(true)
+const [heroAnimating, setHeroAnimating] = useState(false)
 const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
@@ -1527,12 +1528,17 @@ const [menuOpen, setMenuOpen] = useState(false)
 
 useEffect(() => {
   const interval = setInterval(() => {
+    setHeroAnimating(true)
     setHeroVisible(false)
 
     setTimeout(() => {
       setHeroImageIndex((prev) => (prev + 1) % HERO_IMAGES.length)
       setHeroVisible(true)
-    }, 250)
+    }, 320)
+
+    setTimeout(() => {
+      setHeroAnimating(false)
+    }, 900)
   }, 5000)
 
   return () => clearInterval(interval)
@@ -1752,24 +1758,51 @@ useEffect(() => {
   >
     <div
   style={{
+    position: "relative",
     borderRadius: 28,
     overflow: "hidden",
-    boxShadow: "0 24px 64px rgba(30,58,95,0.22)",
-    border: "4px solid rgba(255,255,255,0.9)",
-    background: "#fff",
+    boxShadow: "0 24px 64px rgba(30,58,95,0.18), 0 8px 24px rgba(59,130,246,0.10)",
+    border: "4px solid rgba(255,255,255,0.88)",
+    background: "linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%)",
+    backdropFilter: "blur(4px)",
   }}
 >
+  <div
+    style={{
+      position: "absolute",
+      inset: 0,
+      background: "radial-gradient(circle at top left, rgba(255,255,255,0.65), transparent 42%)",
+      pointerEvents: "none",
+      zIndex: 2,
+    }}
+  />
+
+  <div
+    style={{
+      position: "absolute",
+      inset: 0,
+      boxShadow: "inset 0 0 40px rgba(255,255,255,0.22)",
+      pointerEvents: "none",
+      zIndex: 2,
+    }}
+  />
+
   <img
     src={HERO_IMAGES[heroImageIndex]}
     alt="Topos de bolo artesanais personalizados feitos em Portugal"
     style={{
       width: "100%",
-      height: 420,
-      objectFit: "cover",
+      height: 460,
+      objectFit: "contain",
       objectPosition: "center",
       display: "block",
       opacity: heroVisible ? 1 : 0,
-      transition: "opacity 0.5s ease",
+      transform: heroAnimating ? "scale(1.02)" : "scale(1)",
+      filter: heroVisible ? "blur(0px)" : "blur(6px)",
+      transition: "opacity 0.9s ease, transform 1s ease, filter 0.9s ease",
+      position: "relative",
+      zIndex: 1,
+      padding: 16,
     }}
   />
 </div>
