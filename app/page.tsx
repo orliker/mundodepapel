@@ -1144,11 +1144,7 @@ function Configurator({
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between", }}>
-                    <img
-                      src={m.image}
-                      alt={m.label}
-                      style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 10, flexShrink: 0 }}
-                    />
+                    
                     <div>
                       <div style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 14 }}>{m.label}</div>
                       <div style={{ fontSize: 12, color: "#64748b" }}>{m.desc}</div>
@@ -1594,13 +1590,56 @@ useEffect(() => {
       {/* ── NAVBAR ──────────────────────────────────────────────────────────────────────── */}
       <header style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", borderBottom: scrolled ? "1px solid #bfdbfe" : "1px solid transparent", boxShadow: scrolled ? "0 2px 24px rgba(59,130,246,0.10)" : "none", transition: "all 0.3s ease" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 68 }}>
-          <button onClick={() => scrollTo("home")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, padding: 0 }}>
-            <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#1e3a5f)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>🎂</div>
-            <div>
-              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontWeight: 700, fontSize: 15, color: "#1e3a5f", lineHeight: 1.1 }}>Mundo de Papel</div>
-              <div style={{ fontSize: 10, color: "#3b82f6", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>Portugal</div>
-            </div>
-          </button>
+          <button
+  onClick={() => scrollTo("home")}
+  style={{
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: 0,
+  }}
+>
+  <img
+    src="/logo-mundo-de-papel.png"
+    alt="Mundo de Papel Portugal"
+    style={{
+      width: 44,
+      height: 44,
+      borderRadius: "50%",
+      objectFit: "cover",
+      flexShrink: 0,
+      boxShadow: "0 4px 14px rgba(30,58,95,0.14)",
+    }}
+  />
+
+  <div>
+    <div
+      style={{
+        fontFamily: "'Playfair Display',Georgia,serif",
+        fontWeight: 700,
+        fontSize: 15,
+        color: "#1e3a5f",
+        lineHeight: 1.1,
+      }}
+    >
+      Mundo de Papel
+    </div>
+    <div
+      style={{
+        fontSize: 10,
+        color: "#3b82f6",
+        fontWeight: 700,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+      }}
+    >
+      Portugal
+    </div>
+  </div>
+</button>
 
           <nav className="nav-desktop" style={{ display: "flex", gap: 2 }}>
             {navLinks.map(l => (
