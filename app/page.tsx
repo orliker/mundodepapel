@@ -207,37 +207,31 @@ const GALLERY = [
     id: "g1",
     title: "Topo Clássico",
     tag: "Casamento",
-    image: "/images/galeria/classico.jpg",
-  },
-  {
-    id: "g2",
-    title: "Topo Boho",
-    tag: "Casamento",
-    image: "/images/galeria/boho.jpg",
+    image: "/images/galeria/classico.png",
   },
   {
     id: "g3",
     title: "Super-Heróis",
     tag: "Aniversário",
-    image: "/images/galeria/super-herois.jpg",
+    image: "/images/galeria/super-herois.png",
   },
   {
     id: "g4",
     title: "Unicórnio",
     tag: "Aniversário",
-    image: "/images/galeria/unicornio.jpg",
+    image: "/images/galeria/unicornio.png",
   },
   {
     id: "g5",
     title: "Pomba Branca",
     tag: "Batizado",
-    image: "/images/galeria/pomba-branca.jpg",
+    image: "/images/galeria/pomba-branca.png",
   },
   {
     id: "g6",
     title: "Flores Rosa",
     tag: "Dia da Mãe",
-    image: "/images/galeria/flores-rosa.jpg",
+    image: "/images/galeria/flores-rosa.png",
   },
 ]
 
