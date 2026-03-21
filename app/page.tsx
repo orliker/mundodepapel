@@ -65,6 +65,24 @@ const CATEGORIES: ProductReference[] = [
       "Topo de bolo para aniversário, alegre, personalizado, artesanal premium, com nome, idade, tema infantil ou elegante, cores definidas pelo cliente e acabamento delicado.",
   },
   {
+    id: "coroas",
+    slug: "coroas",
+    name: "Coroas",
+    emoji: "👑",
+    image: "/images/categorias/coroas.png",
+    galleryImages: [
+      "/images/categorias/coroas.png",
+      "/images/categorias/coroas-2.png",
+      "/images/categorias/coroas-3.png",
+    ],
+    desc: "Coroas personalizadas, delicadas e elegantes para momentos especiais.",
+    badge: "Novo",
+    price: 8,
+    materials: ["Papel Couché 250g", "Papel Glitter", "Papel Texturizado / Camurça"],
+    aiContext:
+      "Coroas personalizadas em papel, delicadas, elegantes, artesanais premium, com nome, idade, tema e cores escolhidas pelo cliente, acabamento cuidado e visual sofisticado.",
+  },
+  {
     id: "halloween",
     slug: "halloween",
     name: "Halloween",
