@@ -8,6 +8,7 @@ import { AIChatWidget } from "@/components/ai-chat-widget"
 // ─── Constants ────────────────────────────────────────────────────────────────
 const WA_NUMBER = "351965716782"
 const WA_BASE = `https://wa.me/${WA_NUMBER}`
+const CLIENT_INSTAGRAM = "https://instagram.com/mundodepapelportugal"
 const waLink = (text: string) => `${WA_BASE}?text=${encodeURIComponent(text)}`
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -17,6 +18,7 @@ interface ProductReference {
   name: string
   emoji: string
   image: string
+  galleryImages?: string[]
   desc: string
   badge: string | null
   price: number
@@ -50,6 +52,11 @@ const CATEGORIES: ProductReference[] = [
     name: "Aniversário",
     emoji: "🎂",
     image: "/images/categorias/aniversario.png",
+    galleryImages: [
+      "/images/categorias/aniversario.png",
+      "/images/categorias/aniversario-2.png",
+      "/images/categorias/aniversario-3.png",
+    ],
     desc: "Do 1.º ano ao que quiser. Nome, idade e tema à escolha.",
     badge: "Mais popular",
     price: 8,
@@ -63,6 +70,10 @@ const CATEGORIES: ProductReference[] = [
     name: "Halloween",
     emoji: "🎃",
     image: "/images/categorias/halloween.png",
+    galleryImages: [
+      "/images/categorias/halloween.png",
+      "/images/categorias/halloween-2.png",
+    ],
     desc: "Topos de bolo assustadores e divertidos para festas de Halloween. Personalize com nome e idade.",
     badge: "Edição especial",
     price: 8,
@@ -76,6 +87,10 @@ const CATEGORIES: ProductReference[] = [
     name: "Batizado",
     emoji: "🕊️",
     image: "/images/categorias/batizado.png",
+    galleryImages: [
+      "/images/categorias/batizado.png",
+      "/images/categorias/batizado-2.png",
+    ],
     desc: "Um momento único que merece um topo único.",
     badge: null,
     price: 9,
@@ -89,6 +104,10 @@ const CATEGORIES: ProductReference[] = [
     name: "Casamento",
     emoji: "💍",
     image: "/images/categorias/casamento.png",
+    galleryImages: [
+      "/images/categorias/casamento.png",
+      "/images/categorias/casamento-2.png",
+    ],
     desc: "Elegância artesanal para o vosso dia mais especial.",
     badge: "Premium",
     price: 12,
@@ -102,6 +121,10 @@ const CATEGORIES: ProductReference[] = [
     name: "Dia da Mãe",
     emoji: "🌷",
     image: "/images/categorias/dia-mae.png",
+    galleryImages: [
+      "/images/categorias/dia-mae.png",
+      "/images/categorias/dia-mae-2.png",
+    ],
     desc: "Surpreende a mulher mais especial da tua vida.",
     badge: null,
     price: 7,
@@ -115,6 +138,10 @@ const CATEGORIES: ProductReference[] = [
     name: "Dia do Pai",
     emoji: "👔",
     image: "/images/categorias/dia-pai.png",
+    galleryImages: [
+      "/images/categorias/dia-pai.png",
+      "/images/categorias/dia-pai-2.png",
+    ],
     desc: "Celebra o herói da família com estilo próprio.",
     badge: null,
     price: 7,
@@ -128,6 +155,10 @@ const CATEGORIES: ProductReference[] = [
     name: "Dia dos Namorados",
     emoji: "❤️",
     image: "/images/categorias/namorados.png",
+    galleryImages: [
+      "/images/categorias/namorados.png",
+      "/images/categorias/namorados-2.png",
+    ],
     desc: "Amor em cada detalhe, feito à mão com carinho.",
     badge: null,
     price: 8,
@@ -515,9 +546,11 @@ function AIDesignPanel({ onSuggestion }: { onSuggestion: (text: string) => void 
 }) {
   const [aiDescription, setAiDescription] = useState("")
   const [loading, setLoading] = useState(false)
+  const [selectedImage, setSelectedImage] = useState("")
 
   useEffect(() => {
     if (!open || !item) return
+    setSelectedImage(item.image)
 
     const currentItem = item
     let cancelled = false
@@ -617,12 +650,12 @@ Regras:
     borderRadius: 20,
     overflow: "hidden",
     border: "1.5px solid #dbeafe",
-    marginBottom: 18,
+    marginBottom: 12,
     background: "#f8fbff",
   }}
 >
   <img
-    src={item.image}
+    src={selectedImage || item.image}
     alt={item.name}
     style={{
       width: "100%",
@@ -634,6 +667,33 @@ Regras:
     }}
   />
 </div>
+
+        {!!item.galleryImages?.length && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 18 }}>
+            {item.galleryImages.map((img, index) => (
+              <button
+                key={img}
+                onClick={() => setSelectedImage(img)}
+                style={{
+                  padding: 0,
+                  borderRadius: 14,
+                  overflow: "hidden",
+                  border: selectedImage === img ? "2px solid #3b82f6" : "1.5px solid #dbeafe",
+                  background: "#fff",
+                  cursor: "pointer",
+                  boxShadow: selectedImage === img ? "0 6px 18px rgba(59,130,246,0.18)" : "none",
+                }}
+                aria-label={`Ver imagem ${index + 1} de ${item.name}`}
+              >
+                <img
+                  src={img}
+                  alt={`${item.name} ${index + 1}`}
+                  style={{ width: "100%", height: 96, objectFit: "cover", display: "block" }}
+                />
+              </button>
+            ))}
+          </div>
+        )}
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
           <span
@@ -2306,7 +2366,7 @@ useEffect(() => {
             {[
               { icon: "💬", title: "WhatsApp", desc: "Resposta em menos de 24h. Envia-nos uma mensagem agora!", action: waLink("Olá! Gostaria de saber mais sobre os vossos topos de bolo personalizados."), label: "Enviar mensagem", color: "#25d366", isWa: true },
               { icon: "📧", title: "Email", desc: "mundodepapel.portugal@gmail.com", action: "mailto:mundodepapel.portugal@gmail.com", label: "Enviar email", color: "#3b82f6", isWa: false },
-              { icon: "📸", title: "Instagram", desc: "Segue-nos para mais inspiração e novidades.", action: "https://instagram.com/mundodepapelportugal", label: "Ver Instagram", color: "#e1306c", isWa: false },
+              { icon: "📸", title: "Instagram", desc: "Segue-nos para mais inspiração e novidades.", action: CLIENT_INSTAGRAM, label: "Ver Instagram", color: "#e1306c", isWa: false },
               { icon: "🏭", title: "Empresas", desc: "Preços especiais para lojas e empresas. Tabela de preços disponível.", action: WA_BUSINESS, label: "Solicitar tabela de preços", color: "#1e3a5f", isWa: true },
             ].map((c, i) => (
               <Reveal key={i} delay={i * 80}>
